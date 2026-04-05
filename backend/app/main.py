@@ -4,7 +4,13 @@ from fastapi import FastAPI
 
 # Importamos la configuración y la conexión
 from app.database.database import engine, Base
-from app.routers import usuarios_router  
+import app.models.color_model
+import app.models.outfit_prenda_model
+import app.models.outfit_model
+import app.models.prenda_color_model
+import app.models.prenda_model
+import app.models.usuario_model
+from app.routers import colores_router, outfits_router, prendas_router, usuarios_router
 
 # 1. Configurar logging
 logging.basicConfig(
@@ -39,6 +45,9 @@ app = FastAPI(
 
 # 4. Incluir los Routers (Controladores)
 app.include_router(usuarios_router.router, prefix="/api/usuarios", tags=["Usuarios"])
+app.include_router(prendas_router.router, prefix="/api/prendas", tags=["Prendas"])
+app.include_router(outfits_router.router, prefix="/api/outfits", tags=["Outfits"])
+app.include_router(colores_router.router, prefix="/api/colores", tags=["Colores"])
 
 @app.get("/")
 def read_root():
