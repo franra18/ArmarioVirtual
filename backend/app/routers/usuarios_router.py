@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.crud.outfit_crud import OutfitCRUD
+from app.crud.prenda_crud import PrendaCRUD
 from app.crud.usuario_crud import UsuarioCRUD
 from app.database.database import get_db
+from app.schemas.outfit_schema import OutfitResponse
+from app.schemas.prenda_schema import PrendaResponse
 from app.schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 
 router = APIRouter()
@@ -36,6 +40,44 @@ def get_usuario_by_id(usuario_id: int, db: Session = Depends(get_db)):
 	if usuario is None:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
 	return usuario
+
+
+# Endpoint para obtener todas las prendas de un usuario por su ID.
+@router.get(
+	"/{usuario_id}/prendas",
+	response_model=list[PrendaResponse],
+	summary="Obtener prendas de un usuario",
+	description="Devuelve todas las prendas asociadas a un usuario especifico usando su identificador.",
+	responses={
+		200: {"description": "Prendas del usuario obtenidas correctamente"},
+		404: {"description": "Usuario no encontrado"},
+	},
+)
+def get_prendas_by_usuario(usuario_id: int, db: Session = Depends(get_db)):
+	usuario = UsuarioCRUD.get_by_id(db, usuario_id)
+	if usuario is None:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+
+	return PrendaCRUD.get_by_usuario_id(db, usuario_id)
+
+
+# Endpoint para obtener todos los outfits de un usuario por su ID.
+@router.get(
+	"/{usuario_id}/outfits",
+	response_model=list[OutfitResponse],
+	summary="Obtener outfits de un usuario",
+	description="Devuelve todos los outfits asociados a un usuario especifico usando su identificador.",
+	responses={
+		200: {"description": "Outfits del usuario obtenidos correctamente"},
+		404: {"description": "Usuario no encontrado"},
+	},
+)
+def get_outfits_by_usuario(usuario_id: int, db: Session = Depends(get_db)):
+	usuario = UsuarioCRUD.get_by_id(db, usuario_id)
+	if usuario is None:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+
+	return OutfitCRUD.get_by_usuario_id(db, usuario_id)
 
 
 # Endpoint para crear un nuevo usuario.

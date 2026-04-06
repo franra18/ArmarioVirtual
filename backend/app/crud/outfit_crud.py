@@ -37,6 +37,11 @@ class OutfitCRUD:
 	def get_by_id(db: Session, outfit_id: int) -> Outfit | None:
 		return db.query(Outfit).filter(Outfit.id == outfit_id).first()
 
+	# Obtener todos los outfits asociados a un usuario.
+	@staticmethod
+	def get_by_usuario_id(db: Session, usuario_id: int) -> list[Outfit]:
+		return db.query(Outfit).filter(Outfit.usuario_id == usuario_id).all()
+
 	# Crear un nuevo outfit con los datos recibidos.
 	@staticmethod
 	def create(db: Session, data: OutfitCreate) -> Outfit:

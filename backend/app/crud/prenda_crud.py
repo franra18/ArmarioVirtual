@@ -37,6 +37,11 @@ class PrendaCRUD:
 	def get_by_id(db: Session, prenda_id: int) -> Prenda | None:
 		return db.query(Prenda).filter(Prenda.id == prenda_id).first()
 
+	# Obtener todas las prendas asociadas a un usuario.
+	@staticmethod
+	def get_by_usuario_id(db: Session, usuario_id: int) -> list[Prenda]:
+		return db.query(Prenda).filter(Prenda.usuario_id == usuario_id).all()
+
 	# Crear una nueva prenda con los datos recibidos.
 	@staticmethod
 	def create(db: Session, data: PrendaCreate) -> Prenda:
