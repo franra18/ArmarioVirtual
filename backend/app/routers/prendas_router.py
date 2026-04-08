@@ -1,9 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
+from app.crud.prenda_ia_crud import PrendaIACRUD
 from app.crud.prenda_crud import PrendaCRUD
 from app.database.database import get_db
-from app.schemas.prenda_schema import PrendaCreate, PrendaResponse, PrendaUpdate
+from app.schemas.prenda_schema import (
+	PrendaCreate,
+	PrendaCreateFromImageIARequest,
+	PrendaResponse,
+	PrendaUpdate,
+)
 
 router = APIRouter()
 
@@ -52,6 +59,31 @@ def create_prenda(data: PrendaCreate, db: Session = Depends(get_db)):
 		return PrendaCRUD.create(db, data)
 	except ValueError as e:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+# Endpoint para analizar una imagen con IA y registrar automaticamente la prenda.
+@router.post(
+	"/desde-imagen-ia",
+	response_model=PrendaResponse,
+	status_code=status.HTTP_201_CREATED,
+	summary="Crear prenda desde imagen con IA",
+	description="Descarga la imagen desde una URL, consulta IA, valida JSON y crea la prenda.",
+	responses={
+		201: {"description": "Prenda creada correctamente desde imagen"},
+		400: {"description": "Error de negocio o contenido invalido"},
+		422: {"description": "Payload invalido"},
+		502: {"description": "Error al consumir el servicio de IA"},
+	},
+)
+def create_prenda_from_image_ia(data: PrendaCreateFromImageIARequest, db: Session = Depends(get_db)):
+	try:
+		return PrendaIACRUD.create_from_image_url(db, data)
+	except ValidationError as e:
+		raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=e.errors())
+	except ValueError as e:
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+	except RuntimeError as e:
+		raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
 
 
 # Endpoint para actualizar una prenda existente por ID.
