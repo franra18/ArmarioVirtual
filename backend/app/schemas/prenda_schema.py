@@ -5,8 +5,8 @@ class PrendaCreate(BaseModel):
 	usuario_id: int
 	nombre: str
 	tipo_prenda: str
-	nivel_abrigo: int | None = None
-	nivel_elegancia: int | None = None
+	nivel_abrigo: int | None = Field(default=None, ge=1, le=10)
+	nivel_elegancia: int | None = Field(default=None, ge=1, le=10)
 	foto_url: str | None = None
 	color_ids: list[int] = Field(min_length=1)
 
@@ -14,8 +14,8 @@ class PrendaCreate(BaseModel):
 class PrendaIAData(BaseModel):
 	nombre: str = Field(min_length=1)
 	tipo_prenda: str = Field(min_length=1)
-	nivel_abrigo: int = Field(ge=1, le=5)
-	nivel_elegancia: int = Field(ge=1, le=5)
+	nivel_abrigo: int = Field(ge=1, le=10)
+	nivel_elegancia: int = Field(ge=1, le=10)
 	color_ids: list[int] = Field(min_length=1)
 
 	model_config = ConfigDict(
@@ -50,8 +50,8 @@ class PrendaUpdate(BaseModel):
 	usuario_id: int | None = None
 	nombre: str | None = None
 	tipo_prenda: str | None = None
-	nivel_abrigo: int | None = None
-	nivel_elegancia: int | None = None
+	nivel_abrigo: int | None = Field(default=None, ge=1, le=10)
+	nivel_elegancia: int | None = Field(default=None, ge=1, le=10)
 	foto_url: str | None = None
 	color_ids: list[int] | None = Field(default=None, min_length=1)
 

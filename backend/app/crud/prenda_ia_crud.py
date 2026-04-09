@@ -1,27 +1,15 @@
-import json
-import re
-from typing import Any
-
 import requests
-from google import genai
 from google.genai import types
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 from app.crud.color_crud import ColorCRUD
+from app.crud.ia_utils import create_ia_client, generate_ia_text, parse_ia_json
 from app.crud.prenda_crud import PrendaCRUD
 from app.models.prenda_model import Prenda
 from app.schemas.prenda_schema import PrendaCreate, PrendaCreateFromImageIARequest, PrendaIAData
 
 
 class PrendaIACRUD:
-	# Crear un cliente de Gemini usando credenciales seguras del entorno.
-	@staticmethod
-	def _crear_cliente_ia():
-		if not settings.GEMINI_API_KEY:
-			raise ValueError("No se encontro GEMINI_API_KEY en el entorno")
-		return genai.Client(api_key=settings.GEMINI_API_KEY)
-
 	# Descargar bytes de imagen desde un enlace remoto.
 	@staticmethod
 	def _descargar_imagen(image_url: str) -> tuple[bytes, str]:
@@ -56,54 +44,6 @@ class PrendaIACRUD:
 			f"{colores_texto}\n"
 		)
 
-	# Normalizar respuestas de IA con ruido para recuperar un JSON utilizable.
-	@staticmethod
-	def _parse_json_robusto(raw_text: str) -> dict[str, Any]:
-		texto = (raw_text or "").strip()
-		if not texto:
-			raise ValueError("La IA no devolvio contenido")
-
-		fence_match = re.search(r"```(?:json)?\s*(.*?)\s*```", texto, flags=re.IGNORECASE | re.DOTALL)
-		if fence_match:
-			texto = fence_match.group(1).strip()
-
-		for _ in range(3):
-			try:
-				parsed = json.loads(texto)
-			except json.JSONDecodeError:
-				break
-
-			if isinstance(parsed, dict):
-				return parsed
-			if isinstance(parsed, str):
-				texto = parsed.strip()
-				continue
-			raise ValueError("La respuesta de IA no corresponde a un objeto JSON")
-
-		inicio = texto.find("{")
-		fin = texto.rfind("}")
-		if inicio != -1 and fin != -1 and fin > inicio:
-			fragmento = texto[inicio : fin + 1]
-			try:
-				parsed = json.loads(fragmento)
-				if isinstance(parsed, dict):
-					return parsed
-			except json.JSONDecodeError:
-				pass
-
-		texto_sin_comillas = texto
-		if (texto.startswith('"') and texto.endswith('"')) or (texto.startswith("'") and texto.endswith("'")):
-			texto_sin_comillas = texto[1:-1].strip()
-			texto_sin_comillas = texto_sin_comillas.replace('\\"', '"')
-			try:
-				parsed = json.loads(texto_sin_comillas)
-				if isinstance(parsed, dict):
-					return parsed
-			except json.JSONDecodeError:
-				pass
-
-		raise ValueError("No se pudo formatear la respuesta de IA a un JSON valido")
-
 	# Procesar una imagen con IA, validar el JSON y crear la prenda en BD.
 	@staticmethod
 	def create_from_image_url(db: Session, data: PrendaCreateFromImageIARequest) -> Prenda:
@@ -113,19 +53,10 @@ class PrendaIACRUD:
 
 		image_bytes, mime_type = PrendaIACRUD._descargar_imagen(str(data.image_url))
 		prompt = PrendaIACRUD._build_prompt(colores_disponibles)
-		client = PrendaIACRUD._crear_cliente_ia()
+		client = create_ia_client()
 		image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-
-		try:
-			response = client.models.generate_content(
-				model=settings.GEMINI_MODEL,
-				contents=[prompt, image_part],
-			)
-		except Exception as exc:
-			raise RuntimeError("Error al consultar el agente de IA") from exc
-
-		response_text = getattr(response, "text", "") or ""
-		json_payload = PrendaIACRUD._parse_json_robusto(response_text)
+		response_text = generate_ia_text(client, [prompt, image_part])
+		json_payload = parse_ia_json(response_text)
 		ia_data = PrendaIAData.model_validate(json_payload)
 
 		payload = PrendaCreate(
