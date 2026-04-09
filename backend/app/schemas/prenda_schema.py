@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 
 class PrendaCreate(BaseModel):
@@ -16,7 +16,20 @@ class PrendaIAData(BaseModel):
 	tipo_prenda: str = Field(min_length=1)
 	nivel_abrigo: int = Field(ge=1, le=10)
 	nivel_elegancia: int = Field(ge=1, le=10)
-	color_ids: list[int] = Field(min_length=1)
+	color_ids: list[int] | None = None
+	color_nombres: list[str] | None = None
+
+	# Validar que exista al menos un color combinando IDs y nombres detectados.
+	@model_validator(mode="after")
+	def validar_colores_requeridos(self):
+		ids_validos = [color_id for color_id in (self.color_ids or []) if color_id is not None]
+		nombres_validos = [nombre for nombre in (self.color_nombres or []) if (nombre or "").strip()]
+		if not ids_validos and not nombres_validos:
+			raise ValueError("La IA debe devolver color_ids, color_nombres o ambos")
+
+		self.color_ids = ids_validos or None
+		self.color_nombres = nombres_validos or None
+		return self
 
 	model_config = ConfigDict(
 		extra="forbid",
@@ -26,7 +39,8 @@ class PrendaIAData(BaseModel):
 				"tipo_prenda": "camisa",
 				"nivel_abrigo": 2,
 				"nivel_elegancia": 4,
-				"color_ids": [1, 3],
+				"color_ids": [1],
+				"color_nombres": ["azul marino"],
 			}
 		},
 	)

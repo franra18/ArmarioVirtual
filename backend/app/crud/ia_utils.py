@@ -9,12 +9,33 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+CRITERIOS_ABRIGO_ELEGANCIA = (
+	"Criterios de referencia para decidir niveles de abrigo y elegancia:\n"
+	"1) Escala de Nivel de Abrigo (capacidad termica segun temperatura exterior):\n"
+	"- Nivel 1-2 (Muy Ligero): para calor extremo > 30 C. Prendas muy transpirables y minima cobertura (ropa de bano, tops de tirantes, calzado abierto).\n"
+	"- Nivel 3-4 (Ligero): para clima calido 20 C a 25 C. Una capa fina (camisetas manga corta, camisas de lino, faldas ligeras).\n"
+	"- Nivel 5-6 (Intermedio): para entretiempo 15 C a 20 C. Proteccion ante brisa suave o interiores frescos (sudaderas finas, vaqueros estandar, cardigans, calzado cerrado deportivo).\n"
+	"- Nivel 7-8 (Calido): para frio moderado 5 C a 15 C. Materiales que retienen calor (jerseis de lana, gabardinas, chaquetas de cuero, botas).\n"
+	"- Nivel 9-10 (Proteccion Total): para frio intenso < 5 C. Ropa aislante de invierno (abrigos de plumas, parkas, bufandas y guantes termicos).\n"
+	"2) Escala de Nivel de Elegancia (formalidad segun contexto social del prompt):\n"
+	"- Nivel 1-2 (Deportivo/Casa): prioridad total en comodidad o rendimiento fisico (gimnasio, chandal, mallas, casa).\n"
+	"- Nivel 3-4 (Informal/Casual): uso diario sin protocolo (camisetas con graficos, vaqueros desgastados, zapatillas casuales).\n"
+	"- Nivel 5-6 (Casual Elegante): equilibrio para trabajo relajado o social informal (polos, chinos, blusas sencillas, mocasines).\n"
+	"- Nivel 7-8 (Semi-formal): negocios, cenas importantes o celebraciones (blazers, pantalon de vestir, vestido de coctel, zapatos de piel).\n"
+	"- Nivel 9-10 (Formal/Gala): maxima formalidad para etiqueta o ceremonia (esmoquin, traje de tres piezas, vestido largo de gala, accesorios de lujo).\n"
+)
+
 
 # Crear un cliente de Gemini usando la clave definida en el entorno.
 def create_ia_client() -> genai.Client:
 	if not settings.GEMINI_API_KEY:
 		raise ValueError("No se encontro GEMINI_API_KEY en el entorno")
 	return genai.Client(api_key=settings.GEMINI_API_KEY)
+
+
+# Exponer texto base de criterios para reutilizarlo en prompts de IA.
+def get_criterios_abrigo_elegancia() -> str:
+	return CRITERIOS_ABRIGO_ELEGANCIA
 
 
 # Ejecutar una llamada al modelo configurado y devolver solo el texto de respuesta.

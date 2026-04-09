@@ -5,7 +5,7 @@ import requests
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.crud.ia_utils import create_ia_client, generate_ia_text, parse_ia_json
+from app.crud.ia_utils import create_ia_client, generate_ia_text, get_criterios_abrigo_elegancia, parse_ia_json
 from app.crud.outfit_crud import OutfitCRUD
 from app.models.color_model import Color
 from app.models.outfit_model import Outfit
@@ -106,15 +106,19 @@ class OutfitIACRUD:
 		clima_texto = json.dumps(clima_actual, ensure_ascii=False) if clima_actual is not None else "null"
 		prendas_texto = json.dumps(prendas_usuario, ensure_ascii=False)
 		colores_texto = json.dumps(colores_disponibles, ensure_ascii=False)
+		criterios_texto = get_criterios_abrigo_elegancia()
 		return (
 			"Genera UN SOLO outfit usando exclusivamente las prendas disponibles del usuario.\n"
 			"Devuelve UNICAMENTE un JSON valido sin markdown ni texto adicional.\n"
 			"El prompt del usuario tiene prioridad sobre el clima cuando exista conflicto.\n"
-			"Usa niveles de elegancia y abrigo en escala 1-10 para decidir seleccion.\n"
+			"Usa los criterios detallados de abrigo y elegancia para decidir la seleccion.\n"
+			"Si llega clima actual, usa principalmente temperatura_c para el nivel de abrigo y ajusta por sensacion_termica_c.\n"
+			"Si no llega clima, infiere abrigo desde el contexto del prompt del usuario.\n"
 			"Reglas de combinacion:\n"
 			"- El outfit debe tener al menos 1 prenda.\n"
 			"- No repitas tipo_prenda dentro del mismo outfit.\n"
 			"- Selecciona IDs solo del catalogo recibido.\n"
+			f"{criterios_texto}"
 			"JSON de salida EXACTO:\n"
 			"{\n"
 			'  "nombre_outfit": "string",\n'
