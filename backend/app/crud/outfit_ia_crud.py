@@ -5,7 +5,7 @@ import requests
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.crud.ia_utils import create_ia_client, generate_ia_text, get_criterios_abrigo_elegancia, parse_ia_json
+from app.crud.ia_utils import create_ia_client, generate_ia_structured, get_criterios_abrigo_elegancia
 from app.crud.outfit_crud import OutfitCRUD
 from app.models.color_model import Color
 from app.models.outfit_model import Outfit
@@ -171,9 +171,7 @@ class OutfitIACRUD:
 
 		prompt = OutfitIACRUD._build_prompt(data.prompt, prendas_usuario, colores_disponibles, clima_actual)
 		client = create_ia_client()
-		response_text = generate_ia_text(client, [prompt])
-		json_payload = parse_ia_json(response_text)
-		ia_data = OutfitIAData.model_validate(json_payload)
+		ia_data = generate_ia_structured(client, [prompt], OutfitIAData)
 
 		prenda_ids_validos = {prenda["id"] for prenda in prendas_usuario}
 		prenda_ids_validados = OutfitIACRUD._validar_prenda_ids_outfit(

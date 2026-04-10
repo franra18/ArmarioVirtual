@@ -1,13 +1,13 @@
-import json
 import logging
-import re
-from typing import Any
+from typing import Any, TypeVar
 
 from google import genai
+from pydantic import BaseModel, ValidationError
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+TModel = TypeVar("TModel", bound=BaseModel)
 
 CRITERIOS_ABRIGO_ELEGANCIA = (
 	"Criterios de referencia para decidir niveles de abrigo y elegancia:\n"
@@ -39,11 +39,12 @@ def get_criterios_abrigo_elegancia() -> str:
 
 
 # Ejecutar una llamada al modelo configurado y devolver solo el texto de respuesta.
-def generate_ia_text(client: genai.Client, contents: list[Any]) -> str:
+def generate_ia_text(client: genai.Client, contents: list[Any], config: dict[str, Any] | None = None) -> str:
 	try:
 		response = client.models.generate_content(
 			model=settings.GEMINI_MODEL,
 			contents=contents,
+			config=config,
 		)
 	except Exception as exc:
 		logger.exception(
@@ -57,51 +58,23 @@ def generate_ia_text(client: genai.Client, contents: list[Any]) -> str:
 	return getattr(response, "text", "") or ""
 
 
-# Parsear de forma robusta respuestas de IA a un objeto JSON.
-def parse_ia_json(raw_text: str) -> dict[str, Any]:
-	texto = (raw_text or "").strip()
-	if not texto:
-		logger.warning("La IA devolvio contenido vacio")
+# Ejecutar una llamada al modelo configurando JSON Schema y devolver un BaseModel validado.
+def generate_ia_structured(client: genai.Client, contents: list[Any], schema: type[TModel]) -> TModel:
+	response_text = generate_ia_text(
+		client,
+		contents,
+		config={
+			"response_mime_type": "application/json",
+			"response_json_schema": schema.model_json_schema(),
+		},
+	)
+
+	if not (response_text or "").strip():
+		logger.warning("La IA devolvio contenido vacio para salida estructurada")
 		raise ValueError("La IA no devolvio contenido")
 
-	fence_match = re.search(r"```(?:json)?\s*(.*?)\s*```", texto, flags=re.IGNORECASE | re.DOTALL)
-	if fence_match:
-		texto = fence_match.group(1).strip()
-
-	for _ in range(3):
-		try:
-			parsed = json.loads(texto)
-		except json.JSONDecodeError:
-			break
-
-		if isinstance(parsed, dict):
-			return parsed
-		if isinstance(parsed, str):
-			texto = parsed.strip()
-			continue
-		raise ValueError("La respuesta de IA no corresponde a un objeto JSON")
-
-	inicio = texto.find("{")
-	fin = texto.rfind("}")
-	if inicio != -1 and fin != -1 and fin > inicio:
-		fragmento = texto[inicio : fin + 1]
-		try:
-			parsed = json.loads(fragmento)
-			if isinstance(parsed, dict):
-				return parsed
-		except json.JSONDecodeError:
-			pass
-
-	texto_sin_comillas = texto
-	if (texto.startswith('"') and texto.endswith('"')) or (texto.startswith("'") and texto.endswith("'")):
-		texto_sin_comillas = texto[1:-1].strip()
-		texto_sin_comillas = texto_sin_comillas.replace('\\"', '"')
-		try:
-			parsed = json.loads(texto_sin_comillas)
-			if isinstance(parsed, dict):
-				return parsed
-		except json.JSONDecodeError:
-			pass
-
-	logger.warning("No se pudo parsear JSON de IA. Respuesta truncada: %s", texto[:500])
-	raise ValueError("No se pudo formatear la respuesta de IA a un JSON valido")
+	try:
+		return schema.model_validate_json(response_text)
+	except ValidationError as exc:
+		logger.warning("La IA devolvio JSON invalido para el schema %s: %s", schema.__name__, str(exc))
+		raise ValueError("La IA devolvio un JSON que no cumple el esquema esperado") from exc

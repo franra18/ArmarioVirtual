@@ -3,7 +3,7 @@ from google.genai import types
 from sqlalchemy.orm import Session
 
 from app.crud.color_crud import ColorCRUD
-from app.crud.ia_utils import create_ia_client, generate_ia_text, get_criterios_abrigo_elegancia, parse_ia_json
+from app.crud.ia_utils import create_ia_client, generate_ia_structured, get_criterios_abrigo_elegancia
 from app.crud.prenda_crud import PrendaCRUD
 from app.models.prenda_model import Prenda
 from app.schemas.color_schema import ColorCreate
@@ -115,9 +115,7 @@ class PrendaIACRUD:
 		prompt = PrendaIACRUD._build_prompt(colores_disponibles)
 		client = create_ia_client()
 		image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-		response_text = generate_ia_text(client, [prompt, image_part])
-		json_payload = parse_ia_json(response_text)
-		ia_data = PrendaIAData.model_validate(json_payload)
+		ia_data = generate_ia_structured(client, [prompt, image_part], PrendaIAData)
 		color_ids_resueltos = PrendaIACRUD._resolver_color_ids(db, ia_data)
 
 		payload = PrendaCreate(
