@@ -3,3 +3,6 @@ backend/.env
 **/__pycache__/
 progreso.txt
 /.github
+/.agents
+skills-lock.json
+*.example
