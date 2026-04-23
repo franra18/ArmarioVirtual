@@ -3,13 +3,12 @@ import { use_app_selector } from '../../../store/hooks';
 import { select_auth_profile } from '../../auth/selectors';
 import {
   ChevronRightIcon,
-  HangerIcon,
-  LayeredShirtIcon,
   ShirtIcon,
   SparklesIcon,
   SunIcon,
 } from '../../../shared/icons/app-icons';
-import { palette, typography } from '../../../shared/theme/palette';
+import { palette } from '../../../shared/theme/palette';
+import { home_screen_styles } from './home-screen.styles';
 
 export function HomeScreen() {
   const profile = use_app_selector(select_auth_profile);
@@ -18,213 +17,94 @@ export function HomeScreen() {
   const outfits_total = profile?.outfits_total ?? 0;
   const recientes = profile?.recientes ?? [];
 
-  // Código para formatear la fecha actual en español
   const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  
+
   const hoy = new Date();
-  const fechaActual = `${dias[hoy.getDay()]} · ${hoy.getDate()} ${meses[hoy.getMonth()]}`;
+  const fecha_actual = `${dias[hoy.getDay()]} · ${hoy.getDate()} ${meses[hoy.getMonth()]}`;
 
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      style={{ flex: 1, backgroundColor: palette.cream }}
-      contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 34, gap: 20 }}
+      style={home_screen_styles.screen}
+      contentContainerStyle={home_screen_styles.screen_content}
       showsVerticalScrollIndicator={false}
     >
-      <View style={{ gap: 6 }}>
-        <Text
-          selectable
-          style={{
-            fontFamily: typography.body_medium,
-            color: palette.walnut_soft,
-            fontSize: 14,
-            letterSpacing: 1.2,
-            textTransform: 'uppercase',
-          }}
-        >
-          {fechaActual}
+      <View style={home_screen_styles.greeting_section}>
+        <Text selectable style={home_screen_styles.date_text}>
+          {fecha_actual}
         </Text>
-        <Text
-          selectable
-          style={{ fontFamily: typography.display, color: palette.walnut_deep, fontSize: 44, lineHeight: 52 }}
-        >
+        <Text selectable style={home_screen_styles.greeting_text}>
           Buenos días,
         </Text>
-        <Text
-          selectable
-          style={{
-            fontFamily: typography.display,
-            fontStyle: 'italic',
-            color: palette.sky_ink,
-            fontSize: 44,
-            lineHeight: 52,
-          }}
-        >
+        <Text selectable style={home_screen_styles.name_text}>
           {nombre}.
         </Text>
       </View>
 
-      <View
-        style={{
-          backgroundColor: palette.sky_deep,
-          borderRadius: 22,
-          borderCurve: 'continuous',
-          paddingHorizontal: 16,
-          paddingVertical: 14,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0 8px 18px rgba(74, 126, 151, 0.25)',
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+      <View style={home_screen_styles.weather_card}>
+        <View style={home_screen_styles.weather_left}>
           <SunIcon color={palette.walnut_soft} size={31} />
           <View>
-            <Text
-              selectable
-              style={{
-                fontFamily: typography.display,
-                color: palette.walnut_deep,
-                fontSize: 36,
-                lineHeight: 38,
-                fontVariant: ['tabular-nums'],
-              }}
-            >
+            <Text selectable style={home_screen_styles.weather_temp_text}>
               22°
             </Text>
-            <Text selectable style={{ fontFamily: typography.body, color: palette.walnut, fontSize: 15 }}>
+            <Text selectable style={home_screen_styles.weather_desc_text}>
               Soleado · Mijas, Malaga
             </Text>
           </View>
         </View>
-        <View>
-          <Text
-            selectable
-            style={{
-              fontFamily: typography.body_medium,
-              color: palette.walnut,
-              fontSize: 12,
-              letterSpacing: 1,
-              textTransform: 'uppercase',
-              textAlign: 'right',
-            }}
-          >
+        <View style={home_screen_styles.weather_right}>
+          <Text selectable style={home_screen_styles.weather_day_text}>
             Hoy
           </Text>
-          <Text selectable style={{ fontFamily: typography.body_medium, color: palette.walnut_deep, fontSize: 17 }}>
+          <Text selectable style={home_screen_styles.weather_hint_text}>
             Ropa ligera
           </Text>
         </View>
       </View>
 
-      <View style={{ gap: 12 }}>
-        <Text
-          selectable
-          style={{
-            fontFamily: typography.display,
-            color: palette.walnut,
-            fontSize: 24,
-            textTransform: 'uppercase',
-            letterSpacing: 1,
-          }}
-        >
+      <View style={home_screen_styles.wardrobe_section}>
+        <Text selectable style={home_screen_styles.section_title}>
           Mi Armario
         </Text>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View
-            style={{
-              flex: 1,
-              borderRadius: 20,
-              borderCurve: 'continuous',
-              backgroundColor: palette.cream_deep,
-              padding: 14,
-              gap: 10,
-            }}
-          >
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text selectable style={{ fontFamily: typography.display, color: palette.walnut, fontSize: 34 }}>
+        <View style={home_screen_styles.stats_row}>
+          <View style={home_screen_styles.stats_card}>
+            <View style={home_screen_styles.stats_card_header}>
+              <Text selectable style={home_screen_styles.stats_card_title}>
                 Prendas
               </Text>
               <ShirtIcon color={palette.walnut_soft} size={20} />
             </View>
-            <Text
-              selectable
-              style={{
-                fontFamily: typography.display,
-                color: palette.walnut_deep,
-                fontSize: 44,
-                lineHeight: 44,
-                fontVariant: ['tabular-nums'],
-              }}
-            >
+            <Text selectable style={home_screen_styles.stats_card_value}>
               {prendas_total}
             </Text>
           </View>
 
-          <View
-            style={{
-              flex: 1,
-              borderRadius: 20,
-              borderCurve: 'continuous',
-              backgroundColor: palette.cream_deep,
-              padding: 14,
-              gap: 10,
-            }}
-          >
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text selectable style={{ fontFamily: typography.display, color: palette.walnut, fontSize: 34 }}>
+          <View style={home_screen_styles.stats_card}>
+            <View style={home_screen_styles.stats_card_header}>
+              <Text selectable style={home_screen_styles.stats_card_title}>
                 Outfits
               </Text>
-              <LayeredShirtIcon color={palette.walnut_soft} size={20} />
+              <ShirtIcon color={palette.walnut_soft} size={20} />
             </View>
-            <Text
-              selectable
-              style={{
-                fontFamily: typography.display,
-                color: palette.walnut_deep,
-                fontSize: 44,
-                lineHeight: 44,
-                fontVariant: ['tabular-nums'],
-              }}
-            >
+            <Text selectable style={home_screen_styles.stats_card_value}>
               {outfits_total}
             </Text>
           </View>
         </View>
       </View>
 
-      <View
-        style={{
-          borderRadius: 24,
-          borderCurve: 'continuous',
-          backgroundColor: palette.walnut_deep,
-          padding: 16,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0 12px 18px rgba(74, 51, 30, 0.25)',
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-          <View
-            style={{
-              backgroundColor: palette.sky,
-              borderRadius: 14,
-              borderCurve: 'continuous',
-              height: 44,
-              width: 44,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+      <View style={home_screen_styles.ia_card}>
+        <View style={home_screen_styles.ia_card_left}>
+          <View style={home_screen_styles.ia_icon_chip}>
             <SparklesIcon color={palette.walnut} size={18} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text selectable style={{ color: palette.white, fontFamily: typography.display, fontSize: 32 }}>
+          <View style={home_screen_styles.ia_copy}>
+            <Text selectable style={home_screen_styles.ia_title}>
               Outfit con IA
             </Text>
-            <Text selectable style={{ color: palette.cream_deep, fontFamily: typography.body, fontSize: 14 }}>
+            <Text selectable style={home_screen_styles.ia_subtitle}>
               Dime a donde vas y compongo tu look.
             </Text>
           </View>
@@ -232,21 +112,12 @@ export function HomeScreen() {
         <ChevronRightIcon color={palette.white} size={16} />
       </View>
 
-      <View style={{ gap: 10 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text
-            selectable
-            style={{
-              fontFamily: typography.display,
-              color: palette.walnut,
-              fontSize: 20,
-              textTransform: 'uppercase',
-              letterSpacing: 0.8,
-            }}
-          >
+      <View style={home_screen_styles.recent_section}>
+        <View style={home_screen_styles.recent_header}>
+          <Text selectable style={home_screen_styles.recent_header_title}>
             Añadidos recientemente
           </Text>
-          <Text selectable style={{ color: palette.sky_ink, fontFamily: typography.body_medium, fontSize: 15 }}>
+          <Text selectable style={home_screen_styles.recent_header_link}>
             Ver más
           </Text>
         </View>
@@ -254,33 +125,14 @@ export function HomeScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingBottom: 6 }}
+          contentContainerStyle={home_screen_styles.recent_list_content}
         >
           {recientes.map((prenda, index) => (
-            <View
-              key={`${prenda}-${index}`}
-              style={{
-                width: 122,
-                borderRadius: 16,
-                borderCurve: 'continuous',
-                backgroundColor: palette.cream_deep,
-                padding: 12,
-                gap: 8,
-              }}
-            >
-              <View
-                style={{
-                  height: 58,
-                  borderRadius: 12,
-                  borderCurve: 'continuous',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: palette.cream,
-                }}
-              >
-                <HangerIcon color={palette.walnut_soft} size={18} />
+            <View key={`${prenda}-${index}`} style={home_screen_styles.recent_item}>
+              <View style={home_screen_styles.recent_item_icon_container}>
+                <ShirtIcon color={palette.walnut_soft} size={18} />
               </View>
-              <Text selectable style={{ color: palette.walnut_deep, fontFamily: typography.body_medium, fontSize: 14 }}>
+              <Text selectable style={home_screen_styles.recent_item_name}>
                 {prenda}
               </Text>
             </View>

@@ -8,6 +8,10 @@ export function ItemsIcon({ color, size = 20 }) {
   return <FontAwesome6 name="shirt" size={size} color={color} />;
 }
 
+export function ConjuntosIcon({ color, size = 20 }) {
+  return <FontAwesome6 name="layer-group" size={size} color={color} />;
+}
+
 export function AccountIcon({ color, size = 20 }) {
   return <FontAwesome6 name="user" size={size} color={color} />;
 }
@@ -21,14 +25,6 @@ export function SparklesIcon({ color, size = 20 }) {
 }
 
 export function ShirtIcon({ color, size = 20 }) {
-  return <FontAwesome6 name="shirt" size={size} color={color} />;
-}
-
-export function LayeredShirtIcon({ color, size = 20 }) {
-  return <FontAwesome6 name="shirt" size={size} color={color} />;
-}
-
-export function HangerIcon({ color, size = 20 }) {
   return <FontAwesome6 name="shirt" size={size} color={color} />;
 }
 

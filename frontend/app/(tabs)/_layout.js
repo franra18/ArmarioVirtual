@@ -1,6 +1,6 @@
 import { Redirect, Tabs } from 'expo-router';
-import { AccountIcon, HomeIcon, ItemsIcon } from '../../src/shared/icons/app-icons';
-import { palette, typography } from '../../src/shared/theme/palette';
+import { AccountIcon, ConjuntosIcon, HomeIcon, ItemsIcon } from '../../src/shared/icons/app-icons';
+import { tabs_screen_options } from '../../src/shared/theme/navigation-styles';
 import { select_is_authenticated } from '../../src/features/auth/selectors';
 import { use_app_selector } from '../../src/store/hooks';
 
@@ -18,22 +18,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       initialRouteName="home"
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: palette.walnut,
-        tabBarInactiveTintColor: palette.text_muted,
-        tabBarStyle: {
-          height: 74,
-          paddingTop: 6,
-          paddingBottom: 10,
-          backgroundColor: palette.cream,
-          borderTopColor: palette.cream_deep,
-        },
-        tabBarLabelStyle: {
-          fontFamily: typography.body_medium,
-          fontSize: 12,
-        },
-      }}
+      screenOptions={tabs_screen_options}
     >
       <Tabs.Screen
         name="home"
@@ -46,15 +31,23 @@ export default function TabsLayout() {
         name="items"
         listeners={{ tabPress: block_navigation }}
         options={{
-          title: 'Items',
+          title: 'Prendas',
           tabBarIcon: ({ color, size }) => <ItemsIcon color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="conjuntos"
+        listeners={{ tabPress: block_navigation }}
+        options={{
+          title: 'Conjuntos',
+          tabBarIcon: ({ color, size }) => <ConjuntosIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="account"
         listeners={{ tabPress: block_navigation }}
         options={{
-          title: 'Account',
+          title: 'Cuenta',
           tabBarIcon: ({ color, size }) => <AccountIcon color={color} size={size} />,
         }}
       />

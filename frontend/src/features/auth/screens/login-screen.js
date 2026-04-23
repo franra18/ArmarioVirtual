@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { fetch_user_session } from '../auth-slice';
 import { select_auth_error, select_auth_status } from '../selectors';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { palette, typography } from '../../../shared/theme/palette';
+import { login_input_placeholder_color, login_screen_styles } from './login-screen.styles';
 
 export function LoginScreen() {
   const [user_id, set_user_id] = useState('');
@@ -34,62 +34,37 @@ export function LoginScreen() {
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
-      style={{ flex: 1, backgroundColor: palette.cream }}
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 36 }}
+      style={login_screen_styles.screen}
+      contentContainerStyle={login_screen_styles.screen_content}
     >
-      <View style={{ flex: 1, justifyContent: 'center', gap: 24 }}>
-        <View style={{ gap: 8 }}>
-          <Text
-            selectable
-            style={{ fontFamily: typography.display, fontSize: 42, color: palette.walnut_deep }}
-          >
+      <View style={login_screen_styles.container}>
+        <View style={login_screen_styles.heading_group}>
+          <Text selectable style={login_screen_styles.title}>
             Armario
           </Text>
-          <Text
-            selectable
-            style={{ fontFamily: typography.body, fontSize: 17, color: palette.text_muted, lineHeight: 24 }}
-          >
+          <Text selectable style={login_screen_styles.subtitle}>
             Introduce el id de usuario para entrar de forma simbolica.
           </Text>
         </View>
 
-        <View style={{ gap: 10 }}>
-          <Text
-            selectable
-            style={{
-              fontFamily: typography.body_medium,
-              color: palette.walnut,
-              fontSize: 14,
-              letterSpacing: 1.1,
-              textTransform: 'uppercase',
-            }}
-          >
+        <View style={login_screen_styles.field_group}>
+          <Text selectable style={login_screen_styles.label}>
             ID de usuario
           </Text>
           <TextInput
             value={user_id}
             onChangeText={set_user_id}
             placeholder="Ejemplo: 1"
-            placeholderTextColor={palette.text_muted}
+            placeholderTextColor={login_input_placeholder_color}
             keyboardType="number-pad"
             returnKeyType="done"
             onSubmitEditing={handle_submit}
-            style={{
-              borderWidth: 1,
-              borderColor: palette.cream_deep,
-              borderRadius: 18,
-              paddingHorizontal: 16,
-              paddingVertical: 14,
-              fontSize: 18,
-              color: palette.walnut_deep,
-              fontFamily: typography.body,
-              backgroundColor: palette.white,
-            }}
+            style={login_screen_styles.input}
           />
         </View>
 
         {Boolean(auth_error) && (
-          <Text selectable style={{ color: '#A4482B', fontFamily: typography.body, fontSize: 14 }}>
+          <Text selectable style={login_screen_styles.error_text}>
             {auth_error}
           </Text>
         )}
@@ -97,17 +72,14 @@ export function LoginScreen() {
         <Pressable
           onPress={handle_submit}
           disabled={!can_submit}
-          style={{
-            backgroundColor: can_submit ? palette.walnut : palette.walnut_soft,
-            borderRadius: 18,
-            paddingVertical: 14,
-            alignItems: 'center',
-          }}
+          style={[
+            login_screen_styles.submit_button,
+            can_submit
+              ? login_screen_styles.submit_button_enabled
+              : login_screen_styles.submit_button_disabled,
+          ]}
         >
-          <Text
-            selectable
-            style={{ color: palette.white, fontFamily: typography.body_medium, fontSize: 16 }}
-          >
+          <Text selectable style={login_screen_styles.submit_button_text}>
             {is_loading ? 'Entrando...' : 'Entrar'}
           </Text>
         </Pressable>
