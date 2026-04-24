@@ -5,7 +5,7 @@ export const prenda_card_styles = StyleSheet.create({
   card_container: {
     flex: 1,
     minWidth: 0,
-    marginBottom: 10,
+    marginBottom: 65,
   },
   card_pressable: {
     borderRadius: 16,
@@ -21,6 +21,7 @@ export const prenda_card_styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    overflow: 'hidden',
   },
   visual_tile_cream: {
     backgroundColor: palette.cream_deep,
@@ -39,9 +40,14 @@ export const prenda_card_styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.85)',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 2,
+  },
+  prenda_image: {
+    width: '100%',
+    height: '100%',
   },
   title_text: {
-    marginTop: 2,
+    marginTop: 8,
     color: palette.walnut_deep,
     fontFamily: typography.display,
     fontSize: 20,

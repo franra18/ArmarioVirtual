@@ -191,13 +191,30 @@ export const home_screen_styles = StyleSheet.create({
     padding: 12,
     gap: 8,
   },
-  recent_item_icon_container: {
-    height: 58,
+  recent_item_pressed: {
+    opacity: 0.84,
+  },
+  recent_item_image_container: {
+    height: 86,
     borderRadius: 12,
     borderCurve: 'continuous',
+    overflow: 'hidden',
+    backgroundColor: palette.white,
+  },
+  recent_item_image: {
+    width: '100%',
+    height: '100%',
+  },
+  recent_item_image_fallback: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.cream,
+  },
+  recent_item_image_fallback_text: {
+    color: palette.text_muted,
+    fontFamily: typography.body_medium,
+    fontSize: 12,
   },
   recent_item_name: {
     color: palette.walnut_deep,

@@ -52,7 +52,11 @@ function to_title_case(value) {
 function get_category_label(tipo_prenda) {
   const normalized_tipo = normalize_string(tipo_prenda);
 
-  if (normalized_tipo.includes('camisa') || normalized_tipo.includes('camiseta')) {
+  if (normalized_tipo.includes('camisa')){
+    return 'Camisas';
+  }
+
+  if(normalized_tipo.includes('camiseta')) {
     return 'Camisetas';
   }
 

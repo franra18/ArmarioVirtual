@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Alert, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
+import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
 import { delete_prenda_by_id, fetch_prendas_for_user } from '../state/prendas-slice';
@@ -86,7 +87,7 @@ function format_field_label(field_key) {
     nivel_elegancia: 'Nivel de elegancia',
     foto_url: 'Foto URL',
     color_nombres: 'Colores',
-    fecha_creacion: 'Fecha de creación',
+    fecha_creacion: 'Fecha de registro',
   };
 
   if (labels_by_key[field_key]) {
@@ -163,6 +164,8 @@ export function PrendaDetailScreen() {
     () => prendas.find((item) => String(item?.id) === String(prenda_id ?? '')),
     [prendas, prenda_id]
   );
+  const prenda_image_url = useMemo(() => resolve_prenda_image_url(prenda?.foto_url), [prenda?.foto_url]);
+  const [is_image_fullscreen_open, set_is_image_fullscreen_open] = useState(false);
 
   useEffect(() => {
     if (prenda || !auth_user_id || prendas_status === 'loading') {
@@ -241,6 +244,18 @@ export function PrendaDetailScreen() {
     ]);
   };
 
+  const handle_open_fullscreen_image = () => {
+    if (!prenda_image_url) {
+      return;
+    }
+
+    set_is_image_fullscreen_open(true);
+  };
+
+  const handle_close_fullscreen_image = () => {
+    set_is_image_fullscreen_open(false);
+  };
+
   if (!prenda) {
     return (
       <View style={prenda_detail_screen_styles.empty_wrap}>
@@ -290,14 +305,24 @@ export function PrendaDetailScreen() {
       </Text>
 
       <View style={prenda_detail_screen_styles.visual_card}>
-        <FontAwesome6
-          name={resolve_icon_name(prenda?.tipo_prenda)}
-          size={82}
-          color={palette.walnut}
-        />
-        <Text selectable style={prenda_detail_screen_styles.visual_type_text}>
-          {to_title_case(prenda?.tipo_prenda ?? 'Prenda')}
-        </Text>
+        {prenda_image_url ? (
+          <Pressable
+            onPress={handle_open_fullscreen_image}
+            style={prenda_detail_screen_styles.visual_image_pressable}
+          >
+            <Image
+              source={{ uri: prenda_image_url }}
+              style={prenda_detail_screen_styles.visual_image}
+              resizeMode="cover"
+            />
+          </Pressable>
+        ) : (
+          <FontAwesome6
+            name={resolve_icon_name(prenda?.tipo_prenda)}
+            size={82}
+            color={palette.walnut}
+          />
+        )}
       </View>
 
       <View style={prenda_detail_screen_styles.fields_card}>
@@ -318,6 +343,34 @@ export function PrendaDetailScreen() {
           </View>
         ))}
       </View>
+
+      <Modal
+        visible={is_image_fullscreen_open}
+        transparent
+        animationType="fade"
+        onRequestClose={handle_close_fullscreen_image}
+      >
+        <View style={prenda_detail_screen_styles.fullscreen_wrap}>
+          <Pressable
+            onPress={handle_close_fullscreen_image}
+            style={prenda_detail_screen_styles.fullscreen_backdrop}
+          />
+
+          <Image
+            source={{ uri: prenda_image_url }}
+            style={prenda_detail_screen_styles.fullscreen_image}
+            resizeMode="contain"
+          />
+
+          <Pressable
+            onPress={handle_close_fullscreen_image}
+            style={prenda_detail_screen_styles.fullscreen_close_button}
+            hitSlop={10}
+          >
+            <FontAwesome6 name="xmark" size={18} color={palette.white} />
+          </Pressable>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

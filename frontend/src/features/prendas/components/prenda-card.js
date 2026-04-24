@@ -1,6 +1,7 @@
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
+import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
 import { prenda_card_styles } from './prenda-card.styles';
 
 function normalize_string(value) {
@@ -51,6 +52,7 @@ export function PrendaCard({ prenda, index, is_favorite, on_toggle_favorite, on_
   const tipo_prenda = prenda?.tipo_prenda ?? 'prenda';
   const tile_variant = resolve_tile_variant(prenda?.id, index);
   const icon_name = resolve_icon_name(tipo_prenda);
+  const image_url = resolve_prenda_image_url(prenda?.foto_url);
 
   return (
     <Pressable
@@ -83,7 +85,15 @@ export function PrendaCard({ prenda, index, is_favorite, on_toggle_favorite, on_
           />
         </Pressable>
 
-        <FontAwesome6 name={icon_name} size={47} color={palette.walnut} />
+        {image_url ? (
+          <Image
+            source={{ uri: image_url }}
+            style={prenda_card_styles.prenda_image}
+            resizeMode="cover"
+          />
+        ) : (
+          <FontAwesome6 name={icon_name} size={47} color={palette.walnut} />
+        )}
       </View>
 
       <Text selectable style={prenda_card_styles.title_text} numberOfLines={1}>
