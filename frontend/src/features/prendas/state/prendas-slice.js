@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetch_prendas_for_user_from_backend } from '../api/prendas-api';
+import { delete_prenda_from_backend, fetch_prendas_for_user_from_backend } from '../api/prendas-api';
 
 export const fetch_prendas_for_user = createAsyncThunk(
   'prendas/fetch_prendas_for_user',
@@ -17,11 +17,28 @@ export const fetch_prendas_for_user = createAsyncThunk(
   }
 );
 
+export const delete_prenda_by_id = createAsyncThunk(
+  'prendas/delete_prenda_by_id',
+  async (prenda_id, { rejectWithValue }) => {
+    try {
+      const normalized_prenda_id = String(prenda_id ?? '').trim();
+      await delete_prenda_from_backend(normalized_prenda_id);
+      return {
+        prenda_id: normalized_prenda_id,
+      };
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo eliminar la prenda');
+    }
+  }
+);
+
 const initial_state = {
   items: [],
   status: 'idle',
   error: null,
   loaded_user_id: null,
+  delete_status: 'idle',
+  delete_error: null,
 };
 
 const prendas_slice = createSlice({
@@ -33,6 +50,8 @@ const prendas_slice = createSlice({
       state.status = 'idle';
       state.error = null;
       state.loaded_user_id = null;
+      state.delete_status = 'idle';
+      state.delete_error = null;
     },
   },
   extraReducers: (builder) => {
@@ -52,6 +71,21 @@ const prendas_slice = createSlice({
         state.items = [];
         state.loaded_user_id = null;
         state.error = action.payload ?? 'No se pudieron cargar las prendas';
+      })
+      .addCase(delete_prenda_by_id.pending, (state) => {
+        state.delete_status = 'loading';
+        state.delete_error = null;
+      })
+      .addCase(delete_prenda_by_id.fulfilled, (state, action) => {
+        state.delete_status = 'succeeded';
+        state.delete_error = null;
+        state.items = state.items.filter(
+          (prenda) => String(prenda?.id) !== String(action.payload.prenda_id)
+        );
+      })
+      .addCase(delete_prenda_by_id.rejected, (state, action) => {
+        state.delete_status = 'failed';
+        state.delete_error = action.payload ?? 'No se pudo eliminar la prenda';
       });
   },
 });

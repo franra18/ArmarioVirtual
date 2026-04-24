@@ -92,14 +92,14 @@ async function fetch_with_timeout(url, options = {}) {
   }
 }
 
-export async function get_json(path) {
+async function request_json(method, path) {
   const base_url_candidates = get_backend_base_url_candidates();
   let last_network_error = null;
 
   for (const base_url of base_url_candidates) {
     try {
       const response = await fetch_with_timeout(`${base_url}${path}`, {
-        method: 'GET',
+        method,
         headers: {
           Accept: 'application/json',
         },
@@ -113,7 +113,11 @@ export async function get_json(path) {
       }
 
       if (!response.ok) {
-        const detail = typeof payload?.detail === 'string' ? payload.detail : 'Error al consultar el backend';
+        const detail = (
+          typeof payload?.detail === 'string'
+          ? payload.detail
+          : 'Error al consultar el backend'
+        );
         throw new Error(detail);
       }
 
@@ -135,4 +139,12 @@ export async function get_json(path) {
   }
 
   throw new Error('No se pudo resolver una URL valida para el backend');
+}
+
+export async function get_json(path) {
+  return request_json('GET', path);
+}
+
+export async function delete_json(path) {
+  return request_json('DELETE', path);
 }

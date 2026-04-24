@@ -5,8 +5,12 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
-import { fetch_prendas_for_user } from '../state/prendas-slice';
-import { select_prendas_items, select_prendas_status } from '../selectors/prendas-selectors';
+import { delete_prenda_by_id, fetch_prendas_for_user } from '../state/prendas-slice';
+import {
+  select_prendas_delete_status,
+  select_prendas_items,
+  select_prendas_status,
+} from '../selectors/prendas-selectors';
 import { prenda_detail_screen_styles } from './prenda-detail-screen.styles';
 
 const hidden_field_keys = new Set(['id', 'usuario_id', 'foto_url']);
@@ -153,6 +157,7 @@ export function PrendaDetailScreen() {
   const auth_user_id = use_app_selector(select_auth_user_id);
   const prendas = use_app_selector(select_prendas_items);
   const prendas_status = use_app_selector(select_prendas_status);
+  const delete_status = use_app_selector(select_prendas_delete_status);
 
   const prenda = useMemo(
     () => prendas.find((item) => String(item?.id) === String(prenda_id ?? '')),
@@ -194,8 +199,46 @@ export function PrendaDetailScreen() {
     Alert.alert('Editar prenda', 'Accion disponible proximamente.');
   };
 
+  const is_deleting = delete_status === 'loading';
+
+  const execute_delete_prenda = async () => {
+    if (!prenda?.id) {
+      return;
+    }
+
+    try {
+      await dispatch(delete_prenda_by_id(prenda.id)).unwrap();
+      Alert.alert('Prenda eliminada', 'La prenda se elimino correctamente.', [
+        {
+          text: 'Aceptar',
+          onPress: () => {
+            router.replace('/(tabs)/items');
+          },
+        },
+      ]);
+    } catch (error) {
+      Alert.alert('No se pudo eliminar', String(error ?? 'No se pudo eliminar la prenda.'));
+    }
+  };
+
   const handle_delete_press = () => {
-    Alert.alert('Eliminar prenda', 'Accion disponible proximamente.');
+    if (is_deleting) {
+      return;
+    }
+
+    Alert.alert('Eliminar prenda', 'Esta accion no se puede deshacer. Deseas continuar?', [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Eliminar',
+        style: 'destructive',
+        onPress: () => {
+          void execute_delete_prenda();
+        },
+      },
+    ]);
   };
 
   if (!prenda) {
@@ -232,7 +275,11 @@ export function PrendaDetailScreen() {
           <Pressable onPress={handle_edit_press} style={prenda_detail_screen_styles.action_button}>
             <FontAwesome6 name="pen" size={14} color={palette.walnut} />
           </Pressable>
-          <Pressable onPress={handle_delete_press} style={prenda_detail_screen_styles.action_button}>
+          <Pressable
+            onPress={handle_delete_press}
+            style={prenda_detail_screen_styles.action_button}
+            disabled={is_deleting}
+          >
             <FontAwesome6 name="trash" size={14} color={palette.walnut} />
           </Pressable>
         </View>
