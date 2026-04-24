@@ -11,7 +11,7 @@ import app.models.outfit_model
 import app.models.prenda_color_model
 import app.models.prenda_model
 import app.models.usuario_model
-from app.routers import colores_router, outfits_router, prendas_router, usuarios_router
+from app.routers import clima_router, colores_router, outfits_router, prendas_router, usuarios_router
 
 # 1. Configurar logging
 logging.basicConfig(
@@ -76,6 +76,7 @@ app.include_router(usuarios_router.router, prefix="/api/usuarios", tags=["Usuari
 app.include_router(prendas_router.router, prefix="/api/prendas", tags=["Prendas"])
 app.include_router(outfits_router.router, prefix="/api/outfits", tags=["Outfits"])
 app.include_router(colores_router.router, prefix="/api/colores", tags=["Colores"])
+app.include_router(clima_router.router, prefix="/api/clima", tags=["Clima"])
 
 @app.get("/")
 def read_root():
