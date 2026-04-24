@@ -1,0 +1,125 @@
+import { StyleSheet } from 'react-native';
+import { palette, typography } from '../../../shared/theme/palette';
+
+export const prenda_detail_screen_styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: palette.cream,
+  },
+  content: {
+    paddingHorizontal: 18,
+    paddingTop: 12,
+    paddingBottom: 32,
+    gap: 14,
+  },
+  top_bar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  back_button: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderCurve: 'continuous',
+    backgroundColor: palette.cream_deep,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  right_actions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  action_button: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderCurve: 'continuous',
+    backgroundColor: palette.cream_deep,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    color: palette.walnut_deep,
+    fontFamily: typography.display,
+    fontSize: 34,
+    lineHeight: 38,
+  },
+  visual_card: {
+    borderRadius: 24,
+    borderCurve: 'continuous',
+    backgroundColor: palette.cream_deep,
+    minHeight: 232,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 14,
+    boxShadow: '0 10px 16px rgba(74, 51, 30, 0.14)',
+    padding: 18,
+  },
+  visual_type_text: {
+    color: palette.walnut,
+    fontFamily: typography.body_medium,
+    fontSize: 14,
+  },
+  fields_card: {
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    backgroundColor: palette.white,
+    borderWidth: 1,
+    borderColor: palette.cream_deep,
+    overflow: 'hidden',
+  },
+  field_row: {
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.cream_deep,
+    gap: 2,
+  },
+  field_row_last: {
+    borderBottomWidth: 0,
+  },
+  field_label: {
+    color: palette.text_muted,
+    fontFamily: typography.body_medium,
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  field_value: {
+    color: palette.walnut_deep,
+    fontFamily: typography.body,
+    fontSize: 14,
+  },
+  empty_wrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 24,
+  },
+  empty_title: {
+    color: palette.walnut_deep,
+    fontFamily: typography.display,
+    fontSize: 30,
+  },
+  empty_subtitle: {
+    color: palette.text_muted,
+    fontFamily: typography.body,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  empty_button: {
+    marginTop: 6,
+    borderRadius: 14,
+    borderCurve: 'continuous',
+    backgroundColor: palette.walnut,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+  },
+  empty_button_text: {
+    color: palette.white,
+    fontFamily: typography.body_medium,
+    fontSize: 13,
+  },
+});

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 
@@ -5,8 +7,8 @@ class PrendaCreate(BaseModel):
 	usuario_id: int
 	nombre: str
 	tipo_prenda: str
-	nivel_abrigo: int | None = Field(default=None, ge=1, le=10)
-	nivel_elegancia: int | None = Field(default=None, ge=1, le=10)
+	nivel_abrigo: int | None = Field(default=None, ge=1, le=5)
+	nivel_elegancia: int | None = Field(default=None, ge=1, le=5)
 	foto_url: str | None = None
 	color_ids: list[int] = Field(min_length=1)
 
@@ -14,8 +16,8 @@ class PrendaCreate(BaseModel):
 class PrendaIAData(BaseModel):
 	nombre: str = Field(min_length=1)
 	tipo_prenda: str = Field(min_length=1)
-	nivel_abrigo: int = Field(ge=1, le=10)
-	nivel_elegancia: int = Field(ge=1, le=10)
+	nivel_abrigo: int = Field(ge=1, le=5)
+	nivel_elegancia: int = Field(ge=1, le=5)
 	color_ids: list[int] | None = None
 	color_nombres: list[str] | None = None
 
@@ -64,8 +66,8 @@ class PrendaUpdate(BaseModel):
 	usuario_id: int | None = None
 	nombre: str | None = None
 	tipo_prenda: str | None = None
-	nivel_abrigo: int | None = Field(default=None, ge=1, le=10)
-	nivel_elegancia: int | None = Field(default=None, ge=1, le=10)
+	nivel_abrigo: int | None = Field(default=None, ge=1, le=5)
+	nivel_elegancia: int | None = Field(default=None, ge=1, le=5)
 	foto_url: str | None = None
 	color_ids: list[int] | None = Field(default=None, min_length=1)
 
@@ -78,5 +80,7 @@ class PrendaResponse(BaseModel):
 	nivel_abrigo: int | None = None
 	nivel_elegancia: int | None = None
 	foto_url: str | None = None
+	color_nombres: list[str] = Field(default_factory=list)
+	fecha_creacion: datetime | None = None
 
 	model_config = ConfigDict(from_attributes=True)

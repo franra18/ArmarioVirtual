@@ -1,6 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from sqlalchemy import text
 
 # Importamos la configuración y la conexión
 from app.database.database import engine, Base
@@ -19,6 +20,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger("api-backend")
 
+
+# Asegurar que la columna fecha_creacion exista en prendas para bases ya creadas.
+def ensure_prendas_fecha_creacion_column() -> None:
+    check_column_sql = text(
+        """
+        SELECT COUNT(*) AS total
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'prendas'
+          AND COLUMN_NAME = 'fecha_creacion'
+        """
+    )
+
+    add_column_sql = text(
+        """
+        ALTER TABLE prendas
+        ADD COLUMN fecha_creacion TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+        """
+    )
+
+    with engine.begin() as connection:
+        total = connection.execute(check_column_sql).scalar() or 0
+        if int(total) == 0:
+            connection.execute(add_column_sql)
+            logger.info("Columna fecha_creacion agregada en la tabla prendas.")
+
 # 2. Definir el ciclo de vida (Lifespan)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,6 +53,7 @@ async def lifespan(app: FastAPI):
     try:
         # Esto crea las tablas en MySQL Workbench si no existen
         Base.metadata.create_all(bind=engine)
+        ensure_prendas_fecha_creacion_column()
         logger.info("Tablas sincronizadas y conexión exitosa.")
     except Exception as e:
         logger.error(f"Error al conectar con la base de datos: {e}")

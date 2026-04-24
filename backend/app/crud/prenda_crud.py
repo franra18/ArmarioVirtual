@@ -7,6 +7,30 @@ from app.schemas.prenda_schema import PrendaCreate, PrendaUpdate
 
 
 class PrendaCRUD:
+	# Obtener nombres de colores agrupados por prenda para enriquecer respuestas.
+	@staticmethod
+	def _get_color_names_by_prenda_id(db: Session, prenda_ids: list[int]) -> dict[int, list[str]]:
+		if not prenda_ids:
+			return {}
+
+		filas = (
+			db.query(PrendaColor.prenda_id, Color.nombre)
+			.join(Color, Color.id == PrendaColor.color_id)
+			.filter(PrendaColor.prenda_id.in_(prenda_ids))
+			.all()
+		)
+
+		colores_por_prenda: dict[int, list[str]] = {}
+		for prenda_id, color_nombre in filas:
+			if not color_nombre:
+				continue
+
+			colores_prenda = colores_por_prenda.setdefault(prenda_id, [])
+			if color_nombre not in colores_prenda:
+				colores_prenda.append(color_nombre)
+
+		return colores_por_prenda
+
 	# Normalizar y depurar la lista de IDs de colores recibida.
 	@staticmethod
 	def _normalizar_color_ids(color_ids: list[int]) -> list[int]:
@@ -39,8 +63,30 @@ class PrendaCRUD:
 
 	# Obtener todas las prendas asociadas a un usuario.
 	@staticmethod
-	def get_by_usuario_id(db: Session, usuario_id: int) -> list[Prenda]:
-		return db.query(Prenda).filter(Prenda.usuario_id == usuario_id).all()
+	def get_by_usuario_id(db: Session, usuario_id: int) -> list[dict]:
+		prendas = (
+			db.query(Prenda)
+			.filter(Prenda.usuario_id == usuario_id)
+			.order_by(Prenda.fecha_creacion.desc(), Prenda.id.desc())
+			.all()
+		)
+		prenda_ids = [prenda.id for prenda in prendas]
+		colores_por_prenda = PrendaCRUD._get_color_names_by_prenda_id(db, prenda_ids)
+
+		return [
+			{
+				"id": prenda.id,
+				"usuario_id": prenda.usuario_id,
+				"nombre": prenda.nombre,
+				"tipo_prenda": prenda.tipo_prenda,
+				"nivel_abrigo": prenda.nivel_abrigo,
+				"nivel_elegancia": prenda.nivel_elegancia,
+				"foto_url": prenda.foto_url,
+				"color_nombres": colores_por_prenda.get(prenda.id, []),
+				"fecha_creacion": prenda.fecha_creacion,
+			}
+			for prenda in prendas
+		]
 
 	# Crear una nueva prenda con los datos recibidos.
 	@staticmethod

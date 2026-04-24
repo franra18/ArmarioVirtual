@@ -1,4 +1,5 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { use_app_selector } from '../../../store/hooks';
 import { select_auth_profile } from '../../auth/selectors';
 import {
@@ -6,11 +7,13 @@ import {
   ShirtIcon,
   SparklesIcon,
   SunIcon,
+  ConjuntosIcon,
 } from '../../../shared/icons/app-icons';
 import { palette } from '../../../shared/theme/palette';
 import { home_screen_styles } from './home-screen.styles';
 
 export function HomeScreen() {
+  const router = useRouter();
   const profile = use_app_selector(select_auth_profile);
   const nombre = profile?.nombre ?? 'Usuario';
   const prendas_total = profile?.prendas_total ?? 0;
@@ -69,7 +72,14 @@ export function HomeScreen() {
           Mi Armario
         </Text>
         <View style={home_screen_styles.stats_row}>
-          <View style={home_screen_styles.stats_card}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/(tabs)/items')}
+            style={({ pressed }) => [
+              home_screen_styles.stats_card,
+              pressed ? home_screen_styles.stats_card_pressed : null,
+            ]}
+          >
             <View style={home_screen_styles.stats_card_header}>
               <Text selectable style={home_screen_styles.stats_card_title}>
                 Prendas
@@ -79,14 +89,14 @@ export function HomeScreen() {
             <Text selectable style={home_screen_styles.stats_card_value}>
               {prendas_total}
             </Text>
-          </View>
+          </Pressable>
 
           <View style={home_screen_styles.stats_card}>
             <View style={home_screen_styles.stats_card_header}>
               <Text selectable style={home_screen_styles.stats_card_title}>
                 Outfits
               </Text>
-              <ShirtIcon color={palette.walnut_soft} size={20} />
+              <ConjuntosIcon color={palette.walnut_soft} size={20} />
             </View>
             <Text selectable style={home_screen_styles.stats_card_value}>
               {outfits_total}

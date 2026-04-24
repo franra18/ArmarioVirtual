@@ -1,5 +1,5 @@
-import { HomeScreen } from '../../src/features/home/screens/home-screen';
+import { PrendasScreen } from '../../src/features/prendas/screens/prendas-screen';
 
 export default function ItemsRoute() {
-  return <HomeScreen />;
+  return <PrendasScreen />;
 }

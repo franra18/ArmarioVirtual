@@ -29,7 +29,6 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="items"
-        listeners={{ tabPress: block_navigation }}
         options={{
           title: 'Prendas',
           tabBarIcon: ({ color, size }) => <ItemsIcon color={color} size={size} />,

@@ -100,6 +100,9 @@ export const home_screen_styles = StyleSheet.create({
     padding: 14,
     gap: 10,
   },
+  stats_card_pressed: {
+    opacity: 0.84,
+  },
   stats_card_header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

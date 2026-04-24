@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, TIMESTAMP, text
 
 from app.database.database import Base
 
@@ -13,3 +13,4 @@ class Prenda(Base):
 	nivel_abrigo = Column(Integer, nullable=True)
 	nivel_elegancia = Column(Integer, nullable=True)
 	foto_url = Column(Text, nullable=True)
+	fecha_creacion = Column(TIMESTAMP, nullable=True, server_default=text("CURRENT_TIMESTAMP"))
