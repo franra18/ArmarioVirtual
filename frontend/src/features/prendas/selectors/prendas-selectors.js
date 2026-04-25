@@ -4,3 +4,5 @@ export const select_prendas_error = (state) => state.prendas.error;
 export const select_prendas_loaded_user_id = (state) => state.prendas.loaded_user_id;
 export const select_prendas_delete_status = (state) => state.prendas.delete_status;
 export const select_prendas_delete_error = (state) => state.prendas.delete_error;
+export const select_prendas_create_status = (state) => state.prendas.create_status;
+export const select_prendas_create_error = (state) => state.prendas.create_error;

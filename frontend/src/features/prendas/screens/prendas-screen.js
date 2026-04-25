@@ -29,8 +29,8 @@ const warmth_level_options = [
   { value: 1, label: '1 · Muy Ligero' },
   { value: 2, label: '2 · Ligero' },
   { value: 3, label: '3 · Intermedio' },
-  { value: 4, label: '4 · Calido' },
-  { value: 5, label: '5 · Proteccion Total' },
+  { value: 4, label: '4 · Cálido' },
+  { value: 5, label: '5 · Protección Total' },
 ];
 
 function normalize_string(value) {
@@ -143,6 +143,7 @@ export function PrendasScreen() {
   const [selected_category_id, set_selected_category_id] = useState(null);
   const [favorite_ids, set_favorite_ids] = useState([]);
   const [is_favorites_filter_active, set_is_favorites_filter_active] = useState(false);
+  const [is_add_options_open, set_is_add_options_open] = useState(false);
   const [is_filter_card_open, set_is_filter_card_open] = useState(false);
   const [added_sort_order, set_added_sort_order] = useState('newest');
   const [color_filter_term, set_color_filter_term] = useState('');
@@ -315,9 +316,26 @@ export function PrendasScreen() {
   };
 
   const toggle_filter_card = () => {
+    set_is_add_options_open(false);
     set_is_filter_card_open((is_open) => !is_open);
     set_is_elegance_select_open(false);
     set_is_warmth_select_open(false);
+  };
+
+  const open_add_options = () => {
+    set_is_filter_card_open(false);
+    set_is_elegance_select_open(false);
+    set_is_warmth_select_open(false);
+    set_is_add_options_open(true);
+  };
+
+  const close_add_options = () => {
+    set_is_add_options_open(false);
+  };
+
+  const handle_select_manual_add = () => {
+    set_is_add_options_open(false);
+    router.push('/prendas/nueva-manual');
   };
 
   const select_elegance_level = (level_value) => {
@@ -414,7 +432,7 @@ export function PrendasScreen() {
                 />
               </Pressable>
 
-              <Pressable style={prendas_screen_styles.add_button}>
+              <Pressable onPress={open_add_options} style={prendas_screen_styles.add_button}>
                 <Text selectable style={prendas_screen_styles.add_button_text}>
                   + Añadir
                 </Text>
@@ -667,6 +685,35 @@ export function PrendasScreen() {
           <Text selectable style={prendas_screen_styles.inline_error_text}>
             {prendas_error}
           </Text>
+        </View>
+      )}
+
+      {is_add_options_open && (
+        <View style={prendas_screen_styles.add_options_overlay}>
+          <Pressable onPress={close_add_options} style={prendas_screen_styles.add_options_backdrop} />
+          <View style={prendas_screen_styles.add_options_card}>
+            <Text selectable style={prendas_screen_styles.add_options_title}>
+              ¿Cómo quieres añadir la prenda?
+            </Text>
+
+            <Pressable onPress={handle_select_manual_add} style={prendas_screen_styles.add_options_button_primary}>
+              <Text selectable style={prendas_screen_styles.add_options_button_primary_text}>
+                Manualmente
+              </Text>
+            </Pressable>
+
+            <View style={prendas_screen_styles.add_options_button_disabled}>
+              <Text selectable style={prendas_screen_styles.add_options_button_disabled_text}>
+                Desde foto con IA (próximamente)
+              </Text>
+            </View>
+
+            <Pressable onPress={close_add_options} style={prendas_screen_styles.add_options_button_secondary}>
+              <Text selectable style={prendas_screen_styles.add_options_button_secondary_text}>
+                Cancelar
+              </Text>
+            </Pressable>
+          </View>
         </View>
       )}
     </View>

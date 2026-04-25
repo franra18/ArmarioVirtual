@@ -8,7 +8,6 @@ export const root_stack_screen_options = {
 
 export const tabs_screen_options = {
   headerShown: false,
-  animation: 'fade',
   tabBarActiveTintColor: palette.walnut,
   tabBarInactiveTintColor: palette.text_muted,
   tabBarStyle: {

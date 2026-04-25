@@ -1,5 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { delete_prenda_from_backend, fetch_prendas_for_user_from_backend } from '../api/prendas-api';
+import {
+  create_prenda_manual_in_backend,
+  delete_prenda_from_backend,
+  fetch_prendas_for_user_from_backend,
+} from '../api/prendas-api';
 
 export const fetch_prendas_for_user = createAsyncThunk(
   'prendas/fetch_prendas_for_user',
@@ -32,6 +36,18 @@ export const delete_prenda_by_id = createAsyncThunk(
   }
 );
 
+export const create_prenda_manual = createAsyncThunk(
+  'prendas/create_prenda_manual',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const prenda = await create_prenda_manual_in_backend(payload);
+      return prenda;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo crear la prenda');
+    }
+  }
+);
+
 const initial_state = {
   items: [],
   status: 'idle',
@@ -39,6 +55,8 @@ const initial_state = {
   loaded_user_id: null,
   delete_status: 'idle',
   delete_error: null,
+  create_status: 'idle',
+  create_error: null,
 };
 
 const prendas_slice = createSlice({
@@ -52,6 +70,8 @@ const prendas_slice = createSlice({
       state.loaded_user_id = null;
       state.delete_status = 'idle';
       state.delete_error = null;
+      state.create_status = 'idle';
+      state.create_error = null;
     },
   },
   extraReducers: (builder) => {
@@ -86,6 +106,19 @@ const prendas_slice = createSlice({
       .addCase(delete_prenda_by_id.rejected, (state, action) => {
         state.delete_status = 'failed';
         state.delete_error = action.payload ?? 'No se pudo eliminar la prenda';
+      })
+      .addCase(create_prenda_manual.pending, (state) => {
+        state.create_status = 'loading';
+        state.create_error = null;
+      })
+      .addCase(create_prenda_manual.fulfilled, (state, action) => {
+        state.create_status = 'succeeded';
+        state.create_error = null;
+        state.items = [action.payload, ...state.items];
+      })
+      .addCase(create_prenda_manual.rejected, (state, action) => {
+        state.create_status = 'failed';
+        state.create_error = action.payload ?? 'No se pudo crear la prenda';
       });
   },
 });

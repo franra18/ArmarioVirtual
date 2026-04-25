@@ -92,17 +92,20 @@ async function fetch_with_timeout(url, options = {}) {
   }
 }
 
-async function request_json(method, path) {
+async function request_json(method, path, body) {
   const base_url_candidates = get_backend_base_url_candidates();
   let last_network_error = null;
 
   for (const base_url of base_url_candidates) {
     try {
+      const has_body = body !== undefined;
       const response = await fetch_with_timeout(`${base_url}${path}`, {
         method,
         headers: {
           Accept: 'application/json',
+          ...(has_body ? { 'Content-Type': 'application/json' } : {}),
         },
+        ...(has_body ? { body: JSON.stringify(body) } : {}),
       });
 
       let payload = null;
@@ -147,4 +150,8 @@ export async function get_json(path) {
 
 export async function delete_json(path) {
   return request_json('DELETE', path);
+}
+
+export async function post_json(path, body) {
+  return request_json('POST', path, body);
 }
