@@ -2,10 +2,13 @@ import { palette, typography } from './palette';
 
 export const root_stack_screen_options = {
   headerShown: false,
+  animation: 'fade',
+  animationDuration: 120,
 };
 
 export const tabs_screen_options = {
   headerShown: false,
+  animation: 'fade',
   tabBarActiveTintColor: palette.walnut,
   tabBarInactiveTintColor: palette.text_muted,
   tabBarStyle: {

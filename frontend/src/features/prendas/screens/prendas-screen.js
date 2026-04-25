@@ -119,12 +119,12 @@ function render_empty_state(has_error, prendas_error, on_retry, search_term) {
   return (
     <View style={prendas_screen_styles.empty_state}>
       <Text selectable style={prendas_screen_styles.empty_title}>
-        {search_term.trim() ? 'Sin coincidencias' : 'Sin prendas todavia'}
+        {search_term.trim() ? 'Sin coincidencias' : 'Sin prendas todavía'}
       </Text>
       <Text selectable style={prendas_screen_styles.empty_subtitle}>
         {search_term.trim()
           ? 'Prueba con otro texto o cambia el filtro de categoria.'
-          : 'Cuando anadas prendas en tu armario apareceran aqui.'}
+          : 'Cuando añadas prendas en tu armario aparecerán aquí.'}
       </Text>
     </View>
   );
@@ -140,8 +140,9 @@ export function PrendasScreen() {
   const prendas_loaded_user_id = use_app_selector(select_prendas_loaded_user_id);
 
   const [search_term, set_search_term] = useState('');
-  const [selected_category_id, set_selected_category_id] = useState('todas');
+  const [selected_category_id, set_selected_category_id] = useState(null);
   const [favorite_ids, set_favorite_ids] = useState([]);
+  const [is_favorites_filter_active, set_is_favorites_filter_active] = useState(false);
   const [is_filter_card_open, set_is_filter_card_open] = useState(false);
   const [added_sort_order, set_added_sort_order] = useState('newest');
   const [color_filter_term, set_color_filter_term] = useState('');
@@ -184,15 +185,20 @@ export function PrendasScreen() {
       }
     });
 
-    return [{ id: 'todas', label: 'Todas' }, ...Array.from(categories.values())];
+    return Array.from(categories.values());
   }, [prendas]);
 
   useEffect(() => {
     const is_current_filter_valid = category_options.some((category) => category.id === selected_category_id);
     if (!is_current_filter_valid) {
-      set_selected_category_id('todas');
+      set_selected_category_id(null);
     }
   }, [category_options, selected_category_id]);
+
+  const favorite_id_set = useMemo(
+    () => new Set(favorite_ids.map((id) => String(id))),
+    [favorite_ids]
+  );
 
   const filtered_prendas = useMemo(() => {
     const normalized_term = normalize_string(search_term);
@@ -214,15 +220,26 @@ export function PrendasScreen() {
         selected_warmth_level == null
         || Number(prenda?.nivel_abrigo) === selected_warmth_level
       );
+      const matches_favorites = (
+        !is_favorites_filter_active
+        || favorite_id_set.has(String(prenda?.id))
+      );
 
-      const matches_category = selected_category_id === 'todas' || normalized_tipo === selected_category_id;
+      const matches_category = selected_category_id == null || normalized_tipo === selected_category_id;
       const matches_search = (
         normalized_term.length === 0
         || normalized_nombre.includes(normalized_term)
         || normalized_tipo.includes(normalized_term)
       );
 
-      return matches_category && matches_search && matches_color && matches_elegance && matches_warmth;
+      return (
+        matches_category
+        && matches_search
+        && matches_color
+        && matches_elegance
+        && matches_warmth
+        && matches_favorites
+      );
     });
 
     prendas_filtradas.sort((left_prenda, right_prenda) => {
@@ -240,22 +257,27 @@ export function PrendasScreen() {
     selected_elegance_level,
     selected_warmth_level,
     added_sort_order,
+    is_favorites_filter_active,
+    favorite_id_set,
   ]);
 
   const is_loading_initial = prendas_status === 'loading' && prendas.length === 0;
   const has_error = Boolean(prendas_error);
 
   const handle_toggle_favorite = (prenda_id) => {
-    if (prenda_id == null) {
+    const normalized_prenda_id = String(prenda_id ?? '').trim();
+    if (!normalized_prenda_id) {
       return;
     }
 
     set_favorite_ids((current_ids) => {
-      if (current_ids.includes(prenda_id)) {
-        return current_ids.filter((id) => id !== prenda_id);
+      const is_currently_favorite = current_ids.some((id) => String(id) === normalized_prenda_id);
+
+      if (is_currently_favorite) {
+        return current_ids.filter((id) => String(id) !== normalized_prenda_id);
       }
 
-      return [...current_ids, prenda_id];
+      return [...current_ids, normalized_prenda_id];
     });
   };
 
@@ -284,7 +306,8 @@ export function PrendasScreen() {
 
   const clear_filters = () => {
     set_search_term('');
-    set_selected_category_id('todas');
+    set_selected_category_id(null);
+    set_is_favorites_filter_active(false);
     set_color_filter_term('');
     set_selected_elegance_level(null);
     set_selected_warmth_level(null);
@@ -328,23 +351,34 @@ export function PrendasScreen() {
     );
   }
 
+  const has_odd_filtered_count = filtered_prendas.length % 2 === 1;
+
   return (
     <View style={prendas_screen_styles.screen}>
       <FlatList
         data={filtered_prendas}
         keyExtractor={(item) => String(item.id)}
         numColumns={2}
-        renderItem={({ item, index }) => (
-          <View style={prendas_screen_styles.card_wrapper}>
+        renderItem={({ item, index }) => {
+          const is_last_odd_item = has_odd_filtered_count && index === filtered_prendas.length - 1;
+
+          return (
+          <View
+            style={[
+              prendas_screen_styles.card_wrapper,
+              is_last_odd_item ? prendas_screen_styles.card_wrapper_single_last : null,
+            ]}
+          >
             <PrendaCard
               prenda={item}
               index={index}
-              is_favorite={favorite_ids.includes(item.id)}
+              is_favorite={favorite_id_set.has(String(item.id))}
               on_toggle_favorite={handle_toggle_favorite}
               on_open_detail={handle_open_prenda_detail}
             />
           </View>
-        )}
+          );
+        }}
         ListHeaderComponent={(
           <View style={prendas_screen_styles.header_stack}>
             <Text selectable style={prendas_screen_styles.screen_title}>
@@ -568,12 +602,34 @@ export function PrendasScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={prendas_screen_styles.filters_scroll_content}
             >
+              <Pressable
+                onPress={() => set_is_favorites_filter_active((is_active) => !is_active)}
+                style={[
+                  prendas_screen_styles.filter_chip,
+                  is_favorites_filter_active ? prendas_screen_styles.filter_chip_active : null,
+                ]}
+              >
+                <Text
+                  selectable
+                  style={[
+                    prendas_screen_styles.filter_chip_text,
+                    is_favorites_filter_active ? prendas_screen_styles.filter_chip_text_active : null,
+                  ]}
+                >
+                  Favoritos
+                </Text>
+              </Pressable>
+
               {category_options.map((category) => {
                 const is_active = category.id === selected_category_id;
                 return (
                   <Pressable
                     key={category.id}
-                    onPress={() => set_selected_category_id(category.id)}
+                    onPress={() => {
+                      set_selected_category_id((current_category_id) => (
+                        current_category_id === category.id ? null : category.id
+                      ));
+                    }}
                     style={[
                       prendas_screen_styles.filter_chip,
                       is_active ? prendas_screen_styles.filter_chip_active : null,

@@ -251,9 +251,11 @@ export function HomeScreen() {
           <Text selectable style={home_screen_styles.recent_header_title}>
             Añadidos recientemente
           </Text>
-          <Text selectable style={home_screen_styles.recent_header_link}>
-            Ver más
-          </Text>
+          <Pressable onPress={() => router.push('/(tabs)/items')} hitSlop={8}>
+            <Text selectable style={home_screen_styles.recent_header_link}>
+              Ver más
+            </Text>
+          </Pressable>
         </View>
 
         <ScrollView

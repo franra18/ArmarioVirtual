@@ -246,6 +246,10 @@ export const prendas_screen_styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
+  card_wrapper_single_last: {
+    flex: 0,
+    width: '49%',
+  },
   loading_state: {
     flex: 1,
     alignItems: 'center',
