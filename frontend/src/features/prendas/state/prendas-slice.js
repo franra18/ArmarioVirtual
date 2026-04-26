@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
+  create_prenda_from_image_ia_in_backend,
   create_prenda_manual_in_backend,
   delete_prenda_from_backend,
   fetch_prendas_for_user_from_backend,
+  update_prenda_manual_in_backend,
 } from '../api/prendas-api';
 
 export const fetch_prendas_for_user = createAsyncThunk(
@@ -44,6 +46,30 @@ export const create_prenda_manual = createAsyncThunk(
       return prenda;
     } catch (error) {
       return rejectWithValue(error?.message ?? 'No se pudo crear la prenda');
+    }
+  }
+);
+
+export const update_prenda_manual = createAsyncThunk(
+  'prendas/update_prenda_manual',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const prenda = await update_prenda_manual_in_backend(payload?.prenda_id, payload);
+      return prenda;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo actualizar la prenda');
+    }
+  }
+);
+
+export const create_prenda_from_image_ia = createAsyncThunk(
+  'prendas/create_prenda_from_image_ia',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const prenda = await create_prenda_from_image_ia_in_backend(payload);
+      return prenda;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo crear la prenda con IA');
     }
   }
 );
@@ -115,6 +141,36 @@ const prendas_slice = createSlice({
         state.create_status = 'succeeded';
         state.create_error = null;
         state.items = [action.payload, ...state.items];
+      })
+      .addCase(update_prenda_manual.pending, (state) => {
+        state.create_status = 'loading';
+        state.create_error = null;
+      })
+      .addCase(update_prenda_manual.fulfilled, (state, action) => {
+        state.create_status = 'succeeded';
+        state.create_error = null;
+        state.items = state.items.map((prenda) => (
+          String(prenda?.id) === String(action.payload?.id)
+            ? action.payload
+            : prenda
+        ));
+      })
+      .addCase(update_prenda_manual.rejected, (state, action) => {
+        state.create_status = 'failed';
+        state.create_error = action.payload ?? 'No se pudo actualizar la prenda';
+      })
+      .addCase(create_prenda_from_image_ia.pending, (state) => {
+        state.create_status = 'loading';
+        state.create_error = null;
+      })
+      .addCase(create_prenda_from_image_ia.fulfilled, (state, action) => {
+        state.create_status = 'succeeded';
+        state.create_error = null;
+        state.items = [action.payload, ...state.items];
+      })
+      .addCase(create_prenda_from_image_ia.rejected, (state, action) => {
+        state.create_status = 'failed';
+        state.create_error = action.payload ?? 'No se pudo crear la prenda con IA';
       })
       .addCase(create_prenda_manual.rejected, (state, action) => {
         state.create_status = 'failed';

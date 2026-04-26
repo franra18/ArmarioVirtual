@@ -7,6 +7,7 @@ import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
 import { delete_prenda_by_id, fetch_prendas_for_user } from '../state/prendas-slice';
+import { resolve_prenda_icon_name, to_prenda_title_case } from '../utils/prenda-utils';
 import {
   select_prendas_delete_status,
   select_prendas_items,
@@ -41,44 +42,6 @@ const warmth_level_labels = {
   5: 'Proteccion Total',
 };
 
-function normalize_string(value) {
-  return String(value ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
-}
-
-function to_title_case(value) {
-  return String(value ?? '')
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
-    .join(' ');
-}
-
-function resolve_icon_name(tipo_prenda) {
-  const normalized_tipo = normalize_string(tipo_prenda);
-
-  if (normalized_tipo.includes('calcetin') || normalized_tipo.includes('sock')) {
-    return 'socks';
-  }
-
-  if (normalized_tipo.includes('zapa') || normalized_tipo.includes('shoe') || normalized_tipo.includes('bota')) {
-    return 'shoe-prints';
-  }
-
-  if (normalized_tipo.includes('gorra') || normalized_tipo.includes('sombrero')) {
-    return 'hat-cowboy-side';
-  }
-
-  if (normalized_tipo.includes('vestido')) {
-    return 'person-dress';
-  }
-
-  return 'shirt';
-}
-
 function format_field_label(field_key) {
   const labels_by_key = {
     nombre: 'Nombre',
@@ -94,7 +57,7 @@ function format_field_label(field_key) {
     return labels_by_key[field_key];
   }
 
-  return to_title_case(field_key);
+  return to_prenda_title_case(field_key);
 }
 
 function format_level_value(level_value, labels_by_level) {
@@ -199,7 +162,11 @@ export function PrendaDetailScreen() {
   }, [prenda]);
 
   const handle_edit_press = () => {
-    Alert.alert('Editar prenda', 'Accion disponible proximamente.');
+    if (!prenda?.id) {
+      return;
+    }
+
+    router.push(`/prendas/${prenda.id}/editar`);
   };
 
   const is_deleting = delete_status === 'loading';
@@ -211,14 +178,7 @@ export function PrendaDetailScreen() {
 
     try {
       await dispatch(delete_prenda_by_id(prenda.id)).unwrap();
-      Alert.alert('Prenda eliminada', 'La prenda se elimino correctamente.', [
-        {
-          text: 'Aceptar',
-          onPress: () => {
-            router.replace('/(tabs)/items');
-          },
-        },
-      ]);
+      router.replace('/(tabs)/items');
     } catch (error) {
       Alert.alert('No se pudo eliminar', String(error ?? 'No se pudo eliminar la prenda.'));
     }
@@ -318,7 +278,7 @@ export function PrendaDetailScreen() {
           </Pressable>
         ) : (
           <FontAwesome6
-            name={resolve_icon_name(prenda?.tipo_prenda)}
+            name={resolve_prenda_icon_name(prenda?.tipo_prenda)}
             size={82}
             color={palette.walnut}
           />

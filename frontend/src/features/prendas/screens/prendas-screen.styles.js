@@ -313,7 +313,7 @@ export const prendas_screen_styles = StyleSheet.create({
   },
   add_options_overlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   add_options_backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -321,7 +321,6 @@ export const prendas_screen_styles = StyleSheet.create({
   },
   add_options_card: {
     marginHorizontal: 12,
-    marginBottom: 88,
     borderRadius: 18,
     borderCurve: 'continuous',
     backgroundColor: palette.cream,
@@ -357,6 +356,16 @@ export const prendas_screen_styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.sky_deep,
   },
+  add_options_button_ia: {
+    minHeight: 42,
+    borderRadius: 14,
+    borderCurve: 'continuous',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.cream_deep,
+    borderWidth: 1,
+    borderColor: palette.sky_deep,
+  },
   add_options_button_disabled_text: {
     color: palette.text_muted,
     fontFamily: typography.body,
@@ -371,6 +380,11 @@ export const prendas_screen_styles = StyleSheet.create({
     backgroundColor: palette.cream_deep,
   },
   add_options_button_secondary_text: {
+    color: palette.walnut,
+    fontFamily: typography.body_medium,
+    fontSize: 14,
+  },
+  add_options_button_ia_text: {
     color: palette.walnut,
     fontFamily: typography.body_medium,
     fontSize: 14,

@@ -8,6 +8,11 @@ import { select_auth_user_id } from '../../auth/selectors';
 import { PrendaCard } from '../components/prenda-card';
 import { fetch_prendas_for_user } from '../state/prendas-slice';
 import {
+  get_prenda_added_sort_value,
+  get_prenda_category_label,
+  normalize_prenda_text,
+} from '../utils/prenda-utils';
+import {
   select_prendas_error,
   select_prendas_items,
   select_prendas_loaded_user_id,
@@ -32,65 +37,6 @@ const warmth_level_options = [
   { value: 4, label: '4 · Cálido' },
   { value: 5, label: '5 · Protección Total' },
 ];
-
-function normalize_string(value) {
-  return String(value ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
-}
-
-function to_title_case(value) {
-  return String(value ?? '')
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
-    .join(' ');
-}
-
-function get_category_label(tipo_prenda) {
-  const normalized_tipo = normalize_string(tipo_prenda);
-
-  if (normalized_tipo.includes('camisa')){
-    return 'Camisas';
-  }
-
-  if(normalized_tipo.includes('camiseta')) {
-    return 'Camisetas';
-  }
-
-  if (normalized_tipo.includes('chaqueta') || normalized_tipo.includes('abrigo')) {
-    return 'Chaquetas';
-  }
-
-  if (normalized_tipo.includes('pantalon') || normalized_tipo.includes('jean')) {
-    return 'Pantalones';
-  }
-
-  if (normalized_tipo.includes('calcetin') || normalized_tipo.includes('sock')) {
-    return 'Calcetines';
-  }
-
-  const pretty_label = to_title_case(normalized_tipo);
-  if (pretty_label.endsWith('s')) {
-    return pretty_label;
-  }
-
-  const last_letter = pretty_label.slice(-1).toLowerCase();
-  const ends_with_vowel = ['a', 'e', 'i', 'o', 'u'].includes(last_letter);
-  return `${pretty_label}${ends_with_vowel ? 's' : 'es'}`;
-}
-
-function get_prenda_added_sort_value(prenda) {
-  const parsed_date = Date.parse(String(prenda?.fecha_creacion ?? ''));
-  if (!Number.isNaN(parsed_date)) {
-    return parsed_date;
-  }
-
-  const numeric_id = Number(prenda?.id);
-  return Number.isNaN(numeric_id) ? 0 : numeric_id;
-}
 
 function get_selected_option_label(options, selected_value) {
   const matched_option = options.find((option) => option.value === selected_value);
@@ -173,7 +119,7 @@ export function PrendasScreen() {
     const categories = new Map();
 
     prendas.forEach((prenda) => {
-      const normalized_tipo = normalize_string(prenda?.tipo_prenda);
+      const normalized_tipo = normalize_prenda_text(prenda?.tipo_prenda);
       if (!normalized_tipo) {
         return;
       }
@@ -181,7 +127,7 @@ export function PrendasScreen() {
       if (!categories.has(normalized_tipo)) {
         categories.set(normalized_tipo, {
           id: normalized_tipo,
-          label: get_category_label(prenda?.tipo_prenda),
+          label: get_prenda_category_label(prenda?.tipo_prenda),
         });
       }
     });
@@ -202,16 +148,16 @@ export function PrendasScreen() {
   );
 
   const filtered_prendas = useMemo(() => {
-    const normalized_term = normalize_string(search_term);
-    const normalized_color_term = normalize_string(color_filter_term);
+    const normalized_term = normalize_prenda_text(search_term);
+    const normalized_color_term = normalize_prenda_text(color_filter_term);
 
     const prendas_filtradas = prendas.filter((prenda) => {
-      const normalized_tipo = normalize_string(prenda?.tipo_prenda);
-      const normalized_nombre = normalize_string(prenda?.nombre);
+      const normalized_tipo = normalize_prenda_text(prenda?.tipo_prenda);
+      const normalized_nombre = normalize_prenda_text(prenda?.nombre);
       const color_names = Array.isArray(prenda?.color_nombres) ? prenda.color_nombres : [];
       const matches_color = (
         normalized_color_term.length === 0
-        || color_names.some((color_name) => normalize_string(color_name).includes(normalized_color_term))
+        || color_names.some((color_name) => normalize_prenda_text(color_name).includes(normalized_color_term))
       );
       const matches_elegance = (
         selected_elegance_level == null
@@ -336,6 +282,11 @@ export function PrendasScreen() {
   const handle_select_manual_add = () => {
     set_is_add_options_open(false);
     router.push('/prendas/nueva-manual');
+  };
+
+  const handle_select_ia_add = () => {
+    set_is_add_options_open(false);
+    router.push('/prendas/nueva-ia');
   };
 
   const select_elegance_level = (level_value) => {
@@ -702,11 +653,11 @@ export function PrendasScreen() {
               </Text>
             </Pressable>
 
-            <View style={prendas_screen_styles.add_options_button_disabled}>
-              <Text selectable style={prendas_screen_styles.add_options_button_disabled_text}>
-                Desde foto con IA (próximamente)
+            <Pressable onPress={handle_select_ia_add} style={prendas_screen_styles.add_options_button_ia}>
+              <Text selectable style={prendas_screen_styles.add_options_button_ia_text}>
+                Desde foto con IA
               </Text>
-            </View>
+            </Pressable>
 
             <Pressable onPress={close_add_options} style={prendas_screen_styles.add_options_button_secondary}>
               <Text selectable style={prendas_screen_styles.add_options_button_secondary_text}>

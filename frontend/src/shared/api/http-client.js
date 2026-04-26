@@ -155,3 +155,7 @@ export async function delete_json(path) {
 export async function post_json(path, body) {
   return request_json('POST', path, body);
 }
+
+export async function put_json(path, body) {
+  return request_json('PUT', path, body);
+}
