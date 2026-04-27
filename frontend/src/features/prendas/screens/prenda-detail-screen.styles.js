@@ -6,63 +6,206 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     flex: 1,
     backgroundColor: palette.cream,
   },
-  content: {
-    paddingHorizontal: 18,
-    paddingTop: 12,
-    paddingBottom: 32,
-    gap: 14,
+  scroll_content: {
+    paddingBottom: 120,
   },
-  top_bar: {
+  header_image_container: {
+    backgroundColor: palette.sky,
+    position: 'relative',
+    height: 360,
+  },
+  header_controls: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    position: 'absolute',
+    top: 14,
+    left: 18,
+    right: 18,
+    zIndex: 2,
   },
-  back_button: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderCurve: 'continuous',
-    backgroundColor: palette.cream_deep,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  right_actions: {
+  header_right_actions: {
     flexDirection: 'row',
     gap: 8,
   },
-  action_button: {
+  control_button: {
     width: 38,
     height: 38,
     borderRadius: 19,
     borderCurve: 'continuous',
-    backgroundColor: palette.cream_deep,
+    backgroundColor: palette.white,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  image_card: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 0,
+    backgroundColor: palette.sky_deep,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  image_pressable: {
+    width: '100%',
+    height: '100%',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  content: {
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    gap: 16,
+  },
+  prenda_type_label: {
+    color: palette.text_muted,
+    fontFamily: typography.body_medium,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   title: {
     color: palette.walnut_deep,
     fontFamily: typography.display,
-    fontSize: 34,
-    lineHeight: 38,
+    fontSize: 28,
+    lineHeight: 32,
   },
-  visual_card: {
-    borderRadius: 24,
+  tags_row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    borderRadius: 12,
     borderCurve: 'continuous',
-    backgroundColor: palette.white,
-    height: 300,
+    backgroundColor: palette.cream_deep,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  tag_text: {
+    color: palette.walnut,
+    fontFamily: typography.body,
+    fontSize: 13,
+  },
+  section: {
+    gap: 10,
+  },
+  section_label: {
+    color: palette.text_muted,
+    fontFamily: typography.body_medium,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  characteristics_stack: {
+    gap: 0,
+  },
+  characteristic_section: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.cream_deep,
+  },
+  characteristic_section_last: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
+  },
+  characteristic_item: {
+    gap: 6,
+  },
+  characteristic_header_row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: 10,
+  },
+  characteristic_name: {
+    color: palette.text_muted,
+    fontFamily: typography.body,
+    fontSize: 12,
+  },
+  level_segments_row: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  level_segment: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    borderCurve: 'continuous',
+  },
+  level_segment_empty: {
+    backgroundColor: palette.cream_deep,
+  },
+  level_segment_filled_elegance: {
+    backgroundColor: palette.walnut,
+  },
+  level_segment_filled_warmth: {
+    backgroundColor: palette.sky_deep,
+  },
+  level_value: {
+    color: palette.walnut_deep,
+    fontFamily: typography.body_medium,
+    fontSize: 12,
+  },
+  colors_container: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'flex-start',
+  },
+  color_item: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  color_circle: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderCurve: 'continuous',
+    borderWidth: 2,
+    borderColor: palette.cream_deep,
+  },
+  color_name: {
+    color: palette.walnut,
+    fontFamily: typography.body,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  info_row: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  info_item: {
+    flex: 1,
+    gap: 4,
+  },
+  info_label: {
+    color: palette.text_muted,
+    fontFamily: typography.body,
+    fontSize: 12,
+  },
+  info_value: {
+    color: palette.walnut_deep,
+    fontFamily: typography.body_medium,
+    fontSize: 14,
+  },
+  edit_button: {
+    position: 'absolute',
+    bottom: 20,
+    left: 18,
+    right: 18,
+    height: 48,
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    backgroundColor: palette.walnut,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 10px 16px rgba(74, 51, 30, 0.14)',
-    overflow: 'hidden',
-    position: 'relative',
   },
-  visual_image_pressable: {
-    width: '100%',
-    height: '100%',
-  },
-  visual_image: {
-    width: '100%',
-    height: '100%',
+  edit_button_text: {
+    color: palette.white,
+    fontFamily: typography.body_medium,
+    fontSize: 15,
   },
   fullscreen_wrap: {
     flex: 1,
@@ -88,36 +231,6 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  fields_card: {
-    borderRadius: 18,
-    borderCurve: 'continuous',
-    backgroundColor: palette.white,
-    borderWidth: 1,
-    borderColor: palette.cream_deep,
-    overflow: 'hidden',
-  },
-  field_row: {
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    borderBottomWidth: 1,
-    borderBottomColor: palette.cream_deep,
-    gap: 2,
-  },
-  field_row_last: {
-    borderBottomWidth: 0,
-  },
-  field_label: {
-    color: palette.text_muted,
-    fontFamily: typography.body_medium,
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
-  field_value: {
-    color: palette.walnut_deep,
-    fontFamily: typography.body,
-    fontSize: 14,
   },
   empty_wrap: {
     flex: 1,

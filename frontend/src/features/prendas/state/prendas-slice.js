@@ -76,6 +76,7 @@ export const create_prenda_from_image_ia = createAsyncThunk(
 
 const initial_state = {
   items: [],
+  favorite_ids: [],
   status: 'idle',
   error: null,
   loaded_user_id: null,
@@ -89,8 +90,23 @@ const prendas_slice = createSlice({
   name: 'prendas',
   initialState: initial_state,
   reducers: {
+    toggle_prenda_favorite: (state, action) => {
+      const normalized_prenda_id = String(action.payload ?? '').trim();
+      if (!normalized_prenda_id) {
+        return;
+      }
+
+      const is_currently_favorite = state.favorite_ids.some(
+        (favorite_id) => String(favorite_id) === normalized_prenda_id
+      );
+
+      state.favorite_ids = is_currently_favorite
+        ? state.favorite_ids.filter((favorite_id) => String(favorite_id) !== normalized_prenda_id)
+        : [...state.favorite_ids, normalized_prenda_id];
+    },
     clear_prendas_state: (state) => {
       state.items = [];
+      state.favorite_ids = [];
       state.status = 'idle';
       state.error = null;
       state.loaded_user_id = null;
@@ -125,6 +141,9 @@ const prendas_slice = createSlice({
       .addCase(delete_prenda_by_id.fulfilled, (state, action) => {
         state.delete_status = 'succeeded';
         state.delete_error = null;
+        state.favorite_ids = state.favorite_ids.filter(
+          (favorite_id) => String(favorite_id) !== String(action.payload.prenda_id)
+        );
         state.items = state.items.filter(
           (prenda) => String(prenda?.id) !== String(action.payload.prenda_id)
         );
@@ -179,5 +198,5 @@ const prendas_slice = createSlice({
   },
 });
 
-export const { clear_prendas_state } = prendas_slice.actions;
+export const { clear_prendas_state, toggle_prenda_favorite } = prendas_slice.actions;
 export const prendas_reducer = prendas_slice.reducer;

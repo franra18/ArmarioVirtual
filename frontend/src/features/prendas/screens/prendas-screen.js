@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useScrollToTop } from '@react-navigation/native';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
 import { PrendaCard } from '../components/prenda-card';
-import { fetch_prendas_for_user } from '../state/prendas-slice';
+import { fetch_prendas_for_user, toggle_prenda_favorite } from '../state/prendas-slice';
 import {
   get_prenda_added_sort_value,
   get_prenda_category_label,
@@ -14,6 +15,7 @@ import {
 } from '../utils/prenda-utils';
 import {
   select_prendas_error,
+  select_prendas_favorite_ids,
   select_prendas_items,
   select_prendas_loaded_user_id,
   select_prendas_status,
@@ -79,15 +81,19 @@ function render_empty_state(has_error, prendas_error, on_retry, search_term) {
 export function PrendasScreen() {
   const router = useRouter();
   const dispatch = use_app_dispatch();
+  const prendas_list_ref = useRef(null);
+
+  useScrollToTop(prendas_list_ref);
+
   const auth_user_id = use_app_selector(select_auth_user_id);
   const prendas = use_app_selector(select_prendas_items);
+  const favorite_ids = use_app_selector(select_prendas_favorite_ids);
   const prendas_status = use_app_selector(select_prendas_status);
   const prendas_error = use_app_selector(select_prendas_error);
   const prendas_loaded_user_id = use_app_selector(select_prendas_loaded_user_id);
 
   const [search_term, set_search_term] = useState('');
   const [selected_category_id, set_selected_category_id] = useState(null);
-  const [favorite_ids, set_favorite_ids] = useState([]);
   const [is_favorites_filter_active, set_is_favorites_filter_active] = useState(false);
   const [is_add_options_open, set_is_add_options_open] = useState(false);
   const [is_filter_card_open, set_is_filter_card_open] = useState(false);
@@ -212,20 +218,11 @@ export function PrendasScreen() {
   const has_error = Boolean(prendas_error);
 
   const handle_toggle_favorite = (prenda_id) => {
-    const normalized_prenda_id = String(prenda_id ?? '').trim();
-    if (!normalized_prenda_id) {
+    if (prenda_id == null) {
       return;
     }
 
-    set_favorite_ids((current_ids) => {
-      const is_currently_favorite = current_ids.some((id) => String(id) === normalized_prenda_id);
-
-      if (is_currently_favorite) {
-        return current_ids.filter((id) => String(id) !== normalized_prenda_id);
-      }
-
-      return [...current_ids, normalized_prenda_id];
-    });
+    dispatch(toggle_prenda_favorite(prenda_id));
   };
 
   const handle_open_prenda_detail = (prenda) => {
@@ -325,6 +322,7 @@ export function PrendasScreen() {
   return (
     <View style={prendas_screen_styles.screen}>
       <FlatList
+        ref={prendas_list_ref}
         data={filtered_prendas}
         keyExtractor={(item) => String(item.id)}
         numColumns={2}

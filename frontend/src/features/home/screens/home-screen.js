@@ -239,7 +239,7 @@ export function HomeScreen() {
               Outfit con IA
             </Text>
             <Text selectable style={home_screen_styles.ia_subtitle}>
-              Dime a donde vas y compongo tu look.
+              Dime a dónde vas y compongo tu look.
             </Text>
           </View>
         </View>
