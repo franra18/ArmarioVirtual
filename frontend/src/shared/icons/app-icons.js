@@ -36,10 +36,22 @@ export function HeartIcon({ color, size = 16, solid = false }) {
   return <FontAwesome6 name="heart" size={size} color={color} solid={solid} />;
 }
 
+export function TrashIcon({ color, size = 16 }) {
+  return <FontAwesome6 name="trash" size={size} color={color} />;
+}
+
+export function CalendarIcon({ color, size = 14 }) {
+  return <FontAwesome6 name="calendar" size={size} color={color} />;
+}
+
 export function ShirtIcon({ color, size = 20 }) {
   return <FontAwesome6 name="shirt" size={size} color={color} />;
 }
 
 export function ChevronRightIcon({ color, size = 16 }) {
   return <FontAwesome6 name="chevron-right" size={size} color={color} />;
+}
+
+export function BackIcon({ color, size = 16 }) {
+  return <FontAwesome6 name="chevron-left" size={size} color={color} />;
 }

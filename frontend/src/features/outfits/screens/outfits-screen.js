@@ -224,6 +224,11 @@ export function OutfitsScreen() {
                 image_urls={collage_images}
                 is_favorite={favorite_id_set.has(String(item.id))}
                 on_toggle_favorite={handle_toggle_favorite}
+                on_open_detail={(selected_outfit) => {
+                  if (selected_outfit?.id) {
+                    router.push(`/conjuntos/${selected_outfit.id}`);
+                  }
+                }}
               />
             </View>
           );
