@@ -36,7 +36,6 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="conjuntos"
-        listeners={{ tabPress: block_navigation }}
         options={{
           title: 'Conjuntos',
           tabBarIcon: ({ color, size }) => <ConjuntosIcon color={color} size={size} />,

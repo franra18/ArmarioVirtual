@@ -1,5 +1,5 @@
-import { HomeScreen } from '../../src/features/home/screens/home-screen';
+import { OutfitsScreen } from '../../src/features/outfits/screens/outfits-screen';
 
 export default function ConjuntosRoute() {
-  return <HomeScreen />;
+  return <OutfitsScreen />;
 }

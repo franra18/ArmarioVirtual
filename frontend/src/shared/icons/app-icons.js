@@ -24,6 +24,18 @@ export function SparklesIcon({ color, size = 20 }) {
   return <FontAwesome6 name="wand-magic-sparkles" size={size} color={color} />;
 }
 
+export function SearchIcon({ color, size = 16 }) {
+  return <FontAwesome6 name="magnifying-glass" size={size} color={color} />;
+}
+
+export function FilterIcon({ color, size = 16 }) {
+  return <FontAwesome6 name="filter" size={size} color={color} />;
+}
+
+export function HeartIcon({ color, size = 16, solid = false }) {
+  return <FontAwesome6 name="heart" size={size} color={color} solid={solid} />;
+}
+
 export function ShirtIcon({ color, size = 20 }) {
   return <FontAwesome6 name="shirt" size={size} color={color} />;
 }

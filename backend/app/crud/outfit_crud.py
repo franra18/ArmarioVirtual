@@ -7,6 +7,20 @@ from app.schemas.outfit_schema import OutfitCreate, OutfitUpdate
 
 
 class OutfitCRUD:
+	# Construir el payload de respuesta incluyendo las prendas asociadas.
+	@staticmethod
+	def _armar_outfit_respuesta(db: Session, outfit: Outfit) -> dict:
+		prenda_rows = db.query(OutfitPrenda).filter(OutfitPrenda.outfit_id == outfit.id).all()
+		prenda_ids = [row.prenda_id for row in prenda_rows]
+		return {
+			"id": outfit.id,
+			"usuario_id": outfit.usuario_id,
+			"nombre_outfit": outfit.nombre_outfit,
+			"ocasion": outfit.ocasion,
+			"creado_por_ia": outfit.creado_por_ia,
+			"fecha_creacion": outfit.fecha_creacion,
+			"prenda_ids": prenda_ids,
+		}
 	# Normalizar y depurar la lista de IDs de prendas recibida.
 	@staticmethod
 	def _normalizar_prenda_ids(prenda_ids: list[int]) -> list[int]:
@@ -29,22 +43,27 @@ class OutfitCRUD:
 
 	# Obtener todos los outfits registrados.
 	@staticmethod
-	def get_all(db: Session) -> list[Outfit]:
-		return db.query(Outfit).all()
+	def get_all(db: Session) -> list[dict]:
+		outfits = db.query(Outfit).all()
+		return [OutfitCRUD._armar_outfit_respuesta(db, outfit) for outfit in outfits]
 
 	# Obtener un outfit por su identificador.
 	@staticmethod
-	def get_by_id(db: Session, outfit_id: int) -> Outfit | None:
-		return db.query(Outfit).filter(Outfit.id == outfit_id).first()
+	def get_by_id(db: Session, outfit_id: int) -> dict | None:
+		outfit = db.query(Outfit).filter(Outfit.id == outfit_id).first()
+		if not outfit:
+			return None
+		return OutfitCRUD._armar_outfit_respuesta(db, outfit)
 
 	# Obtener todos los outfits asociados a un usuario.
 	@staticmethod
-	def get_by_usuario_id(db: Session, usuario_id: int) -> list[Outfit]:
-		return db.query(Outfit).filter(Outfit.usuario_id == usuario_id).all()
+	def get_by_usuario_id(db: Session, usuario_id: int) -> list[dict]:
+		outfits = db.query(Outfit).filter(Outfit.usuario_id == usuario_id).all()
+		return [OutfitCRUD._armar_outfit_respuesta(db, outfit) for outfit in outfits]
 
 	# Crear un nuevo outfit con los datos recibidos.
 	@staticmethod
-	def create(db: Session, data: OutfitCreate) -> Outfit:
+	def create(db: Session, data: OutfitCreate) -> dict:
 		prenda_ids = OutfitCRUD._normalizar_prenda_ids(data.prenda_ids)
 		if not prenda_ids:
 			raise ValueError("El outfit debe tener al menos una prenda")
@@ -65,11 +84,11 @@ class OutfitCRUD:
 			raise
 
 		db.refresh(nuevo_outfit)
-		return nuevo_outfit
+		return OutfitCRUD._armar_outfit_respuesta(db, nuevo_outfit)
 
 	# Actualizar los campos enviados de un outfit existente.
 	@staticmethod
-	def update(db: Session, outfit_id: int, data: OutfitUpdate) -> Outfit | None:
+	def update(db: Session, outfit_id: int, data: OutfitUpdate) -> dict | None:
 		outfit = db.query(Outfit).filter(Outfit.id == outfit_id).first()
 		if not outfit:
 			return None
@@ -96,7 +115,7 @@ class OutfitCRUD:
 			db.rollback()
 			raise
 		db.refresh(outfit)
-		return outfit
+		return OutfitCRUD._armar_outfit_respuesta(db, outfit)
 
 	# Eliminar un outfit por su identificador.
 	@staticmethod

@@ -65,6 +65,7 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
+    fontWeight: '500',
   },
   title: {
     color: palette.walnut_deep,
@@ -98,6 +99,7 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
+    fontWeight: '600',
   },
   characteristics_stack: {
     gap: 0,
@@ -109,7 +111,7 @@ export const prenda_detail_screen_styles = StyleSheet.create({
   },
   characteristic_section_last: {
     borderBottomWidth: 0,
-    paddingBottom: 0,
+    paddingBottom: 10,
   },
   characteristic_item: {
     gap: 6,

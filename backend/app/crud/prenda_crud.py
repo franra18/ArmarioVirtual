@@ -1,12 +1,23 @@
+from sqlalchemy import exists
 from sqlalchemy.orm import Session
 
 from app.models.color_model import Color
+from app.models.outfit_model import Outfit
+from app.models.outfit_prenda_model import OutfitPrenda
 from app.models.prenda_color_model import PrendaColor
 from app.models.prenda_model import Prenda
 from app.schemas.prenda_schema import PrendaCreate, PrendaUpdate
 
 
 class PrendaCRUD:
+	# Eliminar outfits que quedaron sin prendas asociadas.
+	@staticmethod
+	def _eliminar_outfits_sin_prendas(db: Session) -> int:
+		return (
+			db.query(Outfit)
+			.filter(~exists().where(OutfitPrenda.outfit_id == Outfit.id))
+			.delete(synchronize_session=False)
+		)
 	# Obtener nombres de colores agrupados por prenda para enriquecer respuestas.
 	@staticmethod
 	def _get_color_names_by_prenda_id(db: Session, prenda_ids: list[int]) -> dict[int, list[str]]:
@@ -153,5 +164,17 @@ class PrendaCRUD:
 			return False
 
 		db.delete(prenda)
-		db.commit()
+		try:
+			db.commit()
+		except Exception:
+			db.rollback()
+			raise
+
+		outfits_eliminados = PrendaCRUD._eliminar_outfits_sin_prendas(db)
+		if outfits_eliminados:
+			try:
+				db.commit()
+			except Exception:
+				db.rollback()
+				raise
 		return True

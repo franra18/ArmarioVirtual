@@ -73,6 +73,7 @@ class OutfitResponse(BaseModel):
 	nombre_outfit: str | None = None
 	ocasion: str | None = None
 	creado_por_ia: bool | None = None
+	prenda_ids: list[int] | None = None
 	fecha_creacion: datetime | None = None
 
 	model_config = ConfigDict(from_attributes=True)

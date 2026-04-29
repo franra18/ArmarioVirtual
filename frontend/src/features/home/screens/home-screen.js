@@ -215,7 +215,14 @@ export function HomeScreen() {
             </Text>
           </Pressable>
 
-          <View style={home_screen_styles.stats_card}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/(tabs)/conjuntos')}
+            style={({ pressed }) => [
+              home_screen_styles.stats_card,
+              pressed ? home_screen_styles.stats_card_pressed : null,
+            ]}
+          >
             <View style={home_screen_styles.stats_card_header}>
               <Text selectable style={home_screen_styles.stats_card_title}>
                 Outfits
@@ -225,7 +232,7 @@ export function HomeScreen() {
             <Text selectable style={home_screen_styles.stats_card_value}>
               {outfits_total}
             </Text>
-          </View>
+          </Pressable>
         </View>
       </View>
 
