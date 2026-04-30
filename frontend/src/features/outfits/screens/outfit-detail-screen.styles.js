@@ -149,7 +149,7 @@ export const outfit_detail_screen_styles = StyleSheet.create({
     right: 18,
     bottom: 20,
     height: 48,
-    borderRadius: 18,
+    borderRadius: 50,
     borderCurve: 'continuous',
     backgroundColor: palette.walnut,
     alignItems: 'center',

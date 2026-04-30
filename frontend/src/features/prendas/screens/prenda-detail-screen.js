@@ -163,14 +163,48 @@ function format_date(date_string) {
   }
 
   const months = [
-    'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-    'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
   ];
   const day = parsed_date.getDate();
   const month = months[parsed_date.getMonth()];
   const year = parsed_date.getFullYear();
 
   return `${day} de ${month}, ${year}`;
+}
+
+function relative_time_since(date_string) {
+  const parsed = new Date(String(date_string ?? ''));
+  if (Number.isNaN(parsed.getTime())) {
+    return '';
+  }
+
+  const now = new Date();
+  const diffMs = now - parsed;
+  const seconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days < 1) {
+    if (hours < 1) {
+      if (minutes < 1) return 'Hace unos segundos';
+      return `Hace ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+    }
+    return `Hace ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
+  }
+
+  if (days < 30) {
+    return `Hace ${days} ${days === 1 ? 'día' : 'días'}`;
+  }
+
+  const months = Math.floor(days / 30);
+  if (months < 12) {
+    return `Hace ${months} ${months === 1 ? 'mes' : 'meses'}`;
+  }
+
+  const years = Math.floor(months / 12);
+  return `Hace ${years} ${years === 1 ? 'año' : 'años'}`;
 }
 
 function normalize_level(level_value) {
@@ -467,16 +501,27 @@ export function PrendaDetailScreen() {
           )}
 
           {/* Información adicional */}
-          <View style={prenda_detail_screen_styles.section}>
-            <View style={prenda_detail_screen_styles.info_row}>
-              <View style={prenda_detail_screen_styles.info_item}>
-                <Text selectable style={prenda_detail_screen_styles.section_label}>
-                  Añadida el
-                </Text>
-                <Text selectable style={prenda_detail_screen_styles.info_value}>
-                  {format_date(prenda?.fecha_creacion)}
-                </Text>
+          <View style={[prenda_detail_screen_styles.section, prenda_detail_screen_styles.section_last]}>
+            <Text selectable style={prenda_detail_screen_styles.section_label}>
+              AÑADIDA
+            </Text>
+
+            <View style={prenda_detail_screen_styles.added_card}>
+              <View style={prenda_detail_screen_styles.added_left}>
+                <View style={prenda_detail_screen_styles.added_icon_wrap}>
+                  <FontAwesome6 name="calendar-days" size={18} color={palette.walnut} />
+                </View>
+
+                <View>
+                  <Text selectable style={prenda_detail_screen_styles.info_value}>
+                    {format_date(prenda?.fecha_creacion)}
+                  </Text>
+                </View>
               </View>
+
+              <Text selectable style={prenda_detail_screen_styles.added_relative_text}>
+                {relative_time_since(prenda?.fecha_creacion)}
+              </Text>
             </View>
           </View>
         </View>

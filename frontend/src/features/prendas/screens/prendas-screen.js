@@ -98,7 +98,6 @@ export function PrendasScreen() {
   const [is_add_options_open, set_is_add_options_open] = useState(false);
   const [is_filter_card_open, set_is_filter_card_open] = useState(false);
   const [added_sort_order, set_added_sort_order] = useState('newest');
-  const [color_filter_term, set_color_filter_term] = useState('');
   const [selected_elegance_level, set_selected_elegance_level] = useState(null);
   const [selected_warmth_level, set_selected_warmth_level] = useState(null);
   const [is_elegance_select_open, set_is_elegance_select_open] = useState(false);
@@ -155,16 +154,11 @@ export function PrendasScreen() {
 
   const filtered_prendas = useMemo(() => {
     const normalized_term = normalize_prenda_text(search_term);
-    const normalized_color_term = normalize_prenda_text(color_filter_term);
 
     const prendas_filtradas = prendas.filter((prenda) => {
       const normalized_tipo = normalize_prenda_text(prenda?.tipo_prenda);
       const normalized_nombre = normalize_prenda_text(prenda?.nombre);
       const color_names = Array.isArray(prenda?.color_nombres) ? prenda.color_nombres : [];
-      const matches_color = (
-        normalized_color_term.length === 0
-        || color_names.some((color_name) => normalize_prenda_text(color_name).includes(normalized_color_term))
-      );
       const matches_elegance = (
         selected_elegance_level == null
         || Number(prenda?.nivel_elegancia) === selected_elegance_level
@@ -183,12 +177,12 @@ export function PrendasScreen() {
         normalized_term.length === 0
         || normalized_nombre.includes(normalized_term)
         || normalized_tipo.includes(normalized_term)
+        || color_names.some((color_name) => normalize_prenda_text(color_name).includes(normalized_term))
       );
 
       return (
         matches_category
         && matches_search
-        && matches_color
         && matches_elegance
         && matches_warmth
         && matches_favorites
@@ -206,7 +200,6 @@ export function PrendasScreen() {
     prendas,
     search_term,
     selected_category_id,
-    color_filter_term,
     selected_elegance_level,
     selected_warmth_level,
     added_sort_order,
@@ -242,8 +235,7 @@ export function PrendasScreen() {
   };
 
   const has_advanced_filters = (
-    color_filter_term.trim().length > 0
-    || selected_elegance_level != null
+    selected_elegance_level != null
     || selected_warmth_level != null
     || added_sort_order !== 'newest'
   );
@@ -252,7 +244,6 @@ export function PrendasScreen() {
     set_search_term('');
     set_selected_category_id(null);
     set_is_favorites_filter_active(false);
-    set_color_filter_term('');
     set_selected_elegance_level(null);
     set_selected_warmth_level(null);
     set_added_sort_order('newest');
@@ -433,21 +424,6 @@ export function PrendasScreen() {
                         Más antiguo
                       </Text>
                     </Pressable>
-                  </View>
-                </View>
-
-                <View style={prendas_screen_styles.filter_section}>
-                  <Text selectable style={prendas_screen_styles.filter_label}>
-                    Color
-                  </Text>
-                  <View style={prendas_screen_styles.filter_text_input_wrap}>
-                    <TextInput
-                      value={color_filter_term}
-                      onChangeText={set_color_filter_term}
-                      style={prendas_screen_styles.filter_text_input}
-                      placeholder="Ej: azul"
-                      placeholderTextColor={search_input_placeholder_color}
-                    />
                   </View>
                 </View>
 

@@ -72,6 +72,9 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     fontFamily: typography.display,
     fontSize: 28,
     lineHeight: 32,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.cream_deep,
   },
   tags_row: {
     flexDirection: 'row',
@@ -92,6 +95,13 @@ export const prenda_detail_screen_styles = StyleSheet.create({
   },
   section: {
     gap: 10,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.cream_deep,
+  },
+  section_last: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
   section_label: {
     color: palette.text_muted,
@@ -106,8 +116,6 @@ export const prenda_detail_screen_styles = StyleSheet.create({
   },
   characteristic_section: {
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: palette.cream_deep,
   },
   characteristic_section_last: {
     borderBottomWidth: 0,
@@ -178,6 +186,37 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
   },
+  added_card: {
+    marginTop: 8,
+    borderRadius: 12,
+    borderCurve: 'continuous',
+    backgroundColor: palette.cream_deep,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  added_left: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  added_icon_wrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    borderCurve: 'continuous',
+    backgroundColor: palette.cream,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: palette.cream_deep,
+  },
+  added_relative_text: {
+    color: palette.text_muted,
+    fontFamily: typography.body,
+    fontSize: 12,
+  },
   info_item: {
     flex: 1,
     gap: 4,
@@ -198,7 +237,7 @@ export const prenda_detail_screen_styles = StyleSheet.create({
     left: 18,
     right: 18,
     height: 48,
-    borderRadius: 18,
+    borderRadius: 50,
     borderCurve: 'continuous',
     backgroundColor: palette.walnut,
     alignItems: 'center',
