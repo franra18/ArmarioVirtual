@@ -7,7 +7,8 @@ import { upload_local_image_to_cloudinary } from '../../../shared/utils/cloudina
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
 import { create_prenda_from_image_ia, fetch_prendas_for_user } from '../state/prendas-slice';
-import { prenda_create_ia_screen_styles } from './prenda-create-ia-screen.styles';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { prenda_create_manual_screen_styles as prenda_create_ia_screen_styles } from './prenda-create-manual-screen.styles';
 
 export function PrendaCreateIaScreen() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export function PrendaCreateIaScreen() {
   const is_ios = process.env.EXPO_OS === 'ios';
 
   const [foto_asset, set_foto_asset] = useState(null);
+  const [photo_aspect_ratio, set_photo_aspect_ratio] = useState(1);
   const [local_error, set_local_error] = useState('');
   const [is_processing_submission, set_is_processing_submission] = useState(false);
 
@@ -36,6 +38,14 @@ export function PrendaCreateIaScreen() {
       file_name: String(selected_asset?.fileName ?? ''),
       mime_type: String(selected_asset?.mimeType ?? ''),
     });
+
+    const resolved_width = Number(selected_asset?.width ?? 0);
+    const resolved_height = Number(selected_asset?.height ?? 0);
+    if (resolved_width > 0 && resolved_height > 0) {
+      set_photo_aspect_ratio(resolved_width / resolved_height);
+    } else {
+      set_photo_aspect_ratio(1);
+    }
   };
 
   const pick_image_from_gallery = async () => {
@@ -71,6 +81,7 @@ export function PrendaCreateIaScreen() {
 
   const clear_selected_image = () => {
     set_foto_asset(null);
+    set_photo_aspect_ratio(1);
   };
 
   const handle_submit = async () => {
@@ -127,58 +138,76 @@ export function PrendaCreateIaScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode={is_ios ? 'interactive' : 'on-drag'}
       >
-        <Pressable onPress={() => router.back()} style={prenda_create_ia_screen_styles.back_button}>
-          <Text selectable style={prenda_create_ia_screen_styles.back_button_text}>
-            Volver
+        <View style={prenda_create_ia_screen_styles.header_row}>
+          <Pressable onPress={() => router.back()} style={prenda_create_ia_screen_styles.header_action}>
+            <Text selectable style={prenda_create_ia_screen_styles.header_action_text}>
+              Cancelar
+            </Text>
+          </Pressable>
+          <Text selectable style={prenda_create_ia_screen_styles.header_title}>
+            Añadir con IA
           </Text>
-        </Pressable>
+          <View style={prenda_create_ia_screen_styles.header_action} />
+        </View>
 
-        <Text selectable style={prenda_create_ia_screen_styles.title}>
-          Añadir con IA
-        </Text>
-        <Text selectable style={prenda_create_ia_screen_styles.subtitle}>
-          Sube una foto y el backend detectará los datos de la prenda automáticamente.
-        </Text>
-
-        <View style={prenda_create_ia_screen_styles.visual_card}>
+        <View style={prenda_create_ia_screen_styles.photo_card}>
           {foto_asset?.uri ? (
             <Image
               source={{ uri: foto_asset.uri }}
-              style={prenda_create_ia_screen_styles.visual_image}
-              resizeMode="cover"
+              style={[
+                prenda_create_ia_screen_styles.photo_image,
+                { aspectRatio: photo_aspect_ratio || 1 },
+              ]}
+              resizeMode="contain"
+              onLoad={(event) => {
+                const { width, height } = event.nativeEvent?.source ?? {};
+                if (width && height) {
+                  set_photo_aspect_ratio(width / height);
+                }
+              }}
             />
           ) : (
-            <Text selectable style={prenda_create_ia_screen_styles.visual_placeholder_text}>
-              Sin foto seleccionada
-            </Text>
+            <View style={prenda_create_ia_screen_styles.photo_placeholder}>
+              <View style={prenda_create_ia_screen_styles.photo_icon_wrap}>
+                <FontAwesome6 name="image" size={18} color={palette.walnut} />
+              </View>
+              <Text selectable style={prenda_create_ia_screen_styles.photo_placeholder_text}>
+                Añadir foto de la prenda
+              </Text>
+            </View>
           )}
-        </View>
 
-        <View style={prenda_create_ia_screen_styles.photo_actions_row}>
-          <Pressable onPress={pick_image_from_gallery} style={prenda_create_ia_screen_styles.photo_action_button}>
-            <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_text}>
-              Galería
-            </Text>
-          </Pressable>
-          <Pressable onPress={pick_image_from_camera} style={prenda_create_ia_screen_styles.photo_action_button}>
-            <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_text}>
-              Cámara
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={clear_selected_image}
-            style={prenda_create_ia_screen_styles.photo_action_button_secondary}
-          >
-            <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_secondary_text}>
-              Quitar
-            </Text>
-          </Pressable>
+          <View style={prenda_create_ia_screen_styles.photo_actions_row}>
+            <Pressable onPress={pick_image_from_camera} style={prenda_create_ia_screen_styles.photo_action_button}>
+              <FontAwesome6 name="camera" size={13} color={palette.walnut} />
+              <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_text}>
+                Cámara
+              </Text>
+            </Pressable>
+            <Pressable onPress={pick_image_from_gallery} style={prenda_create_ia_screen_styles.photo_action_button}>
+              <FontAwesome6 name="image" size={13} color={palette.walnut} />
+              <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_text}>
+                Galería
+              </Text>
+            </Pressable>
+          </View>
+
+          {foto_asset?.uri ? (
+            <Pressable onPress={clear_selected_image} style={prenda_create_ia_screen_styles.photo_clear_button}>
+              <Text selectable style={prenda_create_ia_screen_styles.photo_clear_button_text}>
+                Quitar foto
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         <View style={prenda_create_ia_screen_styles.card}>
-          <Text selectable style={prenda_create_ia_screen_styles.helper_text}>
-            La imagen se subirá a Cloudinary y luego se enviará al endpoint de IA para crear la prenda.
-          </Text>
+          <View style={prenda_create_ia_screen_styles.helper_box}>
+            <FontAwesome6 name="circle-info" size={14} color={palette.walnut} style={prenda_create_ia_screen_styles.helper_icon} />
+            <Text selectable style={prenda_create_ia_screen_styles.helper_text}>
+              La IA asignará automáticamente los atributos de la prenda y la registrará en tu armario. Luego podrás editar cualquier detalle.
+            </Text>
+          </View>
         </View>
 
         {Boolean(visible_error) && (

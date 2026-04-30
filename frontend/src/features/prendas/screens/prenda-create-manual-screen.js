@@ -22,20 +22,27 @@ import { select_prendas_create_error, select_prendas_create_status } from '../se
 import { create_prenda_manual, fetch_prendas_for_user, update_prenda_manual } from '../state/prendas-slice';
 import { prenda_create_manual_screen_styles } from './prenda-create-manual-screen.styles';
 
-const warmth_level_options = [
-  { value: 1, label: '1 · Muy Ligero' },
-  { value: 2, label: '2 · Ligero' },
-  { value: 3, label: '3 · Intermedio' },
-  { value: 4, label: '4 · Calido' },
-  { value: 5, label: '5 · Proteccion Total' },
+const tipo_prenda_options = [
+  { value: 'camiseta', label: 'Camiseta', icon: 'shirt' },
+  { value: 'chaqueta', label: 'Chaqueta', icon: 'user-tie' },
+  { value: 'pantalon', label: 'Pantalon', icon: 'person-walking' },
+  { value: 'accesorio', label: 'Accesorio', icon: 'hat-cowboy-side' },
+  { value: 'calzado', label: 'Calzado', icon: 'shoe-prints' },
+  { value: 'otro', label: 'Otro', icon: 'plus' },
 ];
 
-const elegance_level_options = [
-  { value: 1, label: '1 · Deportivo/Casa' },
-  { value: 2, label: '2 · Informal/Casual' },
-  { value: 3, label: '3 · Casual Elegante' },
-  { value: 4, label: '4 · Semi-formal' },
-  { value: 5, label: '5 · Formal/Gala' },
+const elegance_level_labels = ['Deportivo/Casa', 'Casual', 'Casual Elegante', 'Semi-formal', 'Formal'];
+const warmth_level_labels = ['Muy ligero', 'Ligero', 'Intermedio', 'Abrigado', 'Muy abrigado'];
+
+const common_color_options = [
+  { name: 'Azul', swatch: '#3E5E8C' },
+  { name: 'Cielo', swatch: '#8DB5D2' },
+  { name: 'Crudo', swatch: '#EFE5D5' },
+  { name: 'Cuero', swatch: '#7B4E2F' },
+  { name: 'Negro', swatch: '#2B1F17' },
+  { name: 'Rojo', swatch: '#B4503E' },
+  { name: 'Verde', swatch: '#5E7D55' },
+  { name: 'Mostaza', swatch: '#D5B357' },
 ];
 
 function normalize_text(value) {
@@ -45,11 +52,6 @@ function normalize_text(value) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-function get_selected_option_label(options, selected_value) {
-  const matched_option = options.find((option) => option.value === selected_value);
-  return matched_option?.label ?? 'Sin seleccionar';
 }
 
 export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
@@ -63,14 +65,16 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
 
   const [nombre, set_nombre] = useState('');
   const [tipo_prenda, set_tipo_prenda] = useState('');
+  const [selected_tipo_option, set_selected_tipo_option] = useState('');
+  const [custom_tipo_prenda, set_custom_tipo_prenda] = useState('');
   const [foto_asset, set_foto_asset] = useState(null);
   const [existing_foto_url, set_existing_foto_url] = useState('');
+  const [photo_aspect_ratio, set_photo_aspect_ratio] = useState(1);
   const [nivel_abrigo, set_nivel_abrigo] = useState(null);
   const [nivel_elegancia, set_nivel_elegancia] = useState(null);
-  const [is_warmth_select_open, set_is_warmth_select_open] = useState(false);
-  const [is_elegance_select_open, set_is_elegance_select_open] = useState(false);
   const [color_query, set_color_query] = useState('');
   const [selected_colors, set_selected_colors] = useState([]);
+  const [is_custom_color_open, set_is_custom_color_open] = useState(false);
   const [has_prefilled_initial_prenda, set_has_prefilled_initial_prenda] = useState(false);
 
   const [colores, set_colores] = useState([]);
@@ -140,14 +144,31 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
       })
       .filter(Boolean);
 
+    const tipo_value = String(prenda_to_edit.tipo_prenda ?? '').trim();
+    const normalized_tipo = normalize_text(tipo_value);
+    const matched_option = tipo_prenda_options.find((option) => (
+      option.value !== 'otro' && normalize_text(option.label) === normalized_tipo
+    ));
+
     set_nombre(String(prenda_to_edit.nombre ?? ''));
-    set_tipo_prenda(String(prenda_to_edit.tipo_prenda ?? ''));
+    set_tipo_prenda(tipo_value);
+    if (tipo_value && matched_option) {
+      set_selected_tipo_option(matched_option.value);
+      set_custom_tipo_prenda('');
+    } else if (tipo_value) {
+      set_selected_tipo_option('otro');
+      set_custom_tipo_prenda(tipo_value);
+    } else {
+      set_selected_tipo_option('');
+      set_custom_tipo_prenda('');
+    }
     set_existing_foto_url(String(prenda_to_edit.foto_url ?? ''));
     set_foto_asset(null);
     set_nivel_abrigo(prenda_to_edit.nivel_abrigo == null ? null : Number(prenda_to_edit.nivel_abrigo));
     set_nivel_elegancia(prenda_to_edit.nivel_elegancia == null ? null : Number(prenda_to_edit.nivel_elegancia));
     set_selected_colors(selected_color_items);
     set_color_query('');
+    set_is_custom_color_open(false);
     set_has_prefilled_initial_prenda(true);
   }, [colores, colores_status, has_prefilled_initial_prenda, is_editing, prenda_to_edit]);
 
@@ -156,19 +177,15 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
     [selected_colors]
   );
 
-  const color_suggestions = useMemo(() => {
-    const normalized_query = normalize_text(color_query);
-    if (!normalized_query) {
-      return [];
-    }
+  const common_color_name_set = useMemo(
+    () => new Set(common_color_options.map((color_item) => normalize_text(color_item.name))),
+    []
+  );
 
-    return colores
-      .filter((color_item) => {
-        const normalized_name = normalize_text(color_item?.nombre);
-        return normalized_name.includes(normalized_query) && !selected_color_name_set.has(normalized_name);
-      })
-      .slice(0, 8);
-  }, [color_query, colores, selected_color_name_set]);
+  const extra_selected_colors = useMemo(
+    () => selected_colors.filter((color_item) => !common_color_name_set.has(color_item.normalized_name)),
+    [common_color_name_set, selected_colors]
+  );
 
   const add_color_chip_from_name = (color_name, explicit_color_id = null) => {
     const normalized_name = normalize_text(color_name);
@@ -202,6 +219,37 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
     ));
   };
 
+  const handle_select_tipo = (option) => {
+    set_selected_tipo_option(option.value);
+    if (option.value === 'otro') {
+      set_tipo_prenda(custom_tipo_prenda);
+      return;
+    }
+
+    set_custom_tipo_prenda('');
+    set_tipo_prenda(option.label);
+  };
+
+  const handle_custom_tipo_change = (value) => {
+    set_custom_tipo_prenda(value);
+    set_tipo_prenda(value);
+  };
+
+  const toggle_common_color = (color_name) => {
+    const normalized_name = normalize_text(color_name);
+    if (!normalized_name) {
+      return;
+    }
+
+    if (selected_color_name_set.has(normalized_name)) {
+      remove_selected_color(normalized_name);
+      return;
+    }
+
+    const matching_color = colores.find((color_item) => normalize_text(color_item?.nombre) === normalized_name);
+    add_color_chip_from_name(color_name, matching_color?.id ?? null);
+  };
+
   const add_color_from_input = () => {
     const typed_color = String(color_query ?? '').trim();
     if (!typed_color) {
@@ -209,6 +257,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
     }
 
     add_color_chip_from_name(typed_color);
+    set_is_custom_color_open(false);
   };
 
   const resolve_color_ids_for_submit = async () => {
@@ -266,6 +315,14 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
       file_name: String(selected_asset?.fileName ?? ''),
       mime_type: String(selected_asset?.mimeType ?? ''),
     });
+
+    const resolved_width = Number(selected_asset?.width ?? 0);
+    const resolved_height = Number(selected_asset?.height ?? 0);
+    if (resolved_width > 0 && resolved_height > 0) {
+      set_photo_aspect_ratio(resolved_width / resolved_height);
+    } else {
+      set_photo_aspect_ratio(1);
+    }
   };
 
   const pick_image_from_gallery = async () => {
@@ -301,6 +358,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
 
   const clear_selected_image = () => {
     set_foto_asset(null);
+    set_photo_aspect_ratio(1);
     if (is_editing) {
       set_existing_foto_url('');
     }
@@ -387,11 +445,13 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
   };
 
   const visible_error = local_error || create_error || colores_error;
-  const screen_title = is_editing ? 'Editar prenda' : 'Añadir manualmente';
-  const screen_subtitle = is_editing
-    ? 'Modifica los datos de tu prenda y guarda los cambios en el armario.'
-    : 'Rellena los datos de tu prenda y guardala en el armario.';
-  const submit_button_text = is_editing ? 'Guardar cambios' : 'Guardar prenda';
+  const screen_title = is_editing ? 'Editar prenda' : 'Nueva prenda';
+  const submit_button_text = is_editing ? 'Guardar cambios' : 'Añadir al armario';
+  const selected_color_count_label = selected_colors.length
+    ? `${selected_colors.length} seleccionados`
+    : 'Sin seleccionar';
+  const elegance_label = nivel_elegancia ? elegance_level_labels[nivel_elegancia - 1] : 'Sin nivel';
+  const warmth_label = nivel_abrigo ? warmth_level_labels[nivel_abrigo - 1] : 'Sin nivel';
   const visual_image_uri = foto_asset?.uri || resolve_prenda_image_url(existing_foto_url);
 
   return (
@@ -408,264 +468,302 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
       >
-      <Pressable onPress={() => router.back()} style={prenda_create_manual_screen_styles.back_button}>
-        <Text selectable style={prenda_create_manual_screen_styles.back_button_text}>
-          Volver
-        </Text>
-      </Pressable>
-
-      <Text selectable style={prenda_create_manual_screen_styles.title}>
-        {screen_title}
-      </Text>
-      <Text selectable style={prenda_create_manual_screen_styles.subtitle}>
-        {screen_subtitle}
-      </Text>
-
-      <View style={prenda_create_manual_screen_styles.visual_card}>
-        {visual_image_uri ? (
-          <Image
-            source={{ uri: visual_image_uri }}
-            style={prenda_create_manual_screen_styles.visual_image}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text selectable style={prenda_create_manual_screen_styles.visual_placeholder_text}>
-            Sin foto seleccionada
-          </Text>
-        )}
-      </View>
-
-      <View style={prenda_create_manual_screen_styles.photo_actions_row}>
-        <Pressable
-          onPress={pick_image_from_gallery}
-          style={prenda_create_manual_screen_styles.photo_action_button}
-        >
-          <Text selectable style={prenda_create_manual_screen_styles.photo_action_button_text}>
-            Galería
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={pick_image_from_camera}
-          style={prenda_create_manual_screen_styles.photo_action_button}
-        >
-          <Text selectable style={prenda_create_manual_screen_styles.photo_action_button_text}>
-            Cámara
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={clear_selected_image}
-          style={prenda_create_manual_screen_styles.photo_action_button_secondary}
-        >
-          <Text selectable style={prenda_create_manual_screen_styles.photo_action_button_secondary_text}>
-            Quitar
-          </Text>
-        </Pressable>
-      </View>
-
-      <View style={prenda_create_manual_screen_styles.card}>
-        <Text selectable style={prenda_create_manual_screen_styles.field_label}>
-          Nombre
-        </Text>
-        <TextInput
-          value={nombre}
-          onChangeText={set_nombre}
-          placeholder="Ej: Camisa Oxford"
-          placeholderTextColor={palette.text_muted}
-          style={prenda_create_manual_screen_styles.input}
-        />
-
-        <Text selectable style={prenda_create_manual_screen_styles.field_label}>
-          Tipo de prenda
-        </Text>
-        <TextInput
-          value={tipo_prenda}
-          onChangeText={set_tipo_prenda}
-          placeholder="Ej: camisa"
-          placeholderTextColor={palette.text_muted}
-          style={prenda_create_manual_screen_styles.input}
-        />
-
-        <Text selectable style={prenda_create_manual_screen_styles.field_label}>
-          Nivel de abrigo (opcional)
-        </Text>
-        <Pressable
-          onPress={() => {
-            set_is_warmth_select_open((is_open) => !is_open);
-            set_is_elegance_select_open(false);
-          }}
-          style={prenda_create_manual_screen_styles.select_trigger}
-        >
-          <Text selectable style={prenda_create_manual_screen_styles.select_trigger_text}>
-            {get_selected_option_label(warmth_level_options, nivel_abrigo)}
-          </Text>
-          <FontAwesome6
-            name={is_warmth_select_open ? 'chevron-up' : 'chevron-down'}
-            size={12}
-            color={palette.walnut}
-          />
-        </Pressable>
-        {is_warmth_select_open && (
-          <View style={prenda_create_manual_screen_styles.select_dropdown}>
-            {warmth_level_options.map((option) => {
-              const is_selected = option.value === nivel_abrigo;
-              return (
-                <Pressable
-                  key={`warmth-option-${option.value}`}
-                  onPress={() => {
-                    set_nivel_abrigo(option.value);
-                    set_is_warmth_select_open(false);
-                  }}
-                  style={[
-                    prenda_create_manual_screen_styles.select_option,
-                    is_selected ? prenda_create_manual_screen_styles.select_option_active : null,
-                  ]}
-                >
-                  <Text
-                    selectable
-                    style={[
-                      prenda_create_manual_screen_styles.select_option_text,
-                      is_selected ? prenda_create_manual_screen_styles.select_option_text_active : null,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
-
-        <Text selectable style={prenda_create_manual_screen_styles.field_label}>
-          Nivel de elegancia (opcional)
-        </Text>
-        <Pressable
-          onPress={() => {
-            set_is_elegance_select_open((is_open) => !is_open);
-            set_is_warmth_select_open(false);
-          }}
-          style={prenda_create_manual_screen_styles.select_trigger}
-        >
-          <Text selectable style={prenda_create_manual_screen_styles.select_trigger_text}>
-            {get_selected_option_label(elegance_level_options, nivel_elegancia)}
-          </Text>
-          <FontAwesome6
-            name={is_elegance_select_open ? 'chevron-up' : 'chevron-down'}
-            size={12}
-            color={palette.walnut}
-          />
-        </Pressable>
-        {is_elegance_select_open && (
-          <View style={prenda_create_manual_screen_styles.select_dropdown}>
-            {elegance_level_options.map((option) => {
-              const is_selected = option.value === nivel_elegancia;
-              return (
-                <Pressable
-                  key={`elegance-option-${option.value}`}
-                  onPress={() => {
-                    set_nivel_elegancia(option.value);
-                    set_is_elegance_select_open(false);
-                  }}
-                  style={[
-                    prenda_create_manual_screen_styles.select_option,
-                    is_selected ? prenda_create_manual_screen_styles.select_option_active : null,
-                  ]}
-                >
-                  <Text
-                    selectable
-                    style={[
-                      prenda_create_manual_screen_styles.select_option_text,
-                      is_selected ? prenda_create_manual_screen_styles.select_option_text_active : null,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
-
-        <Text selectable style={prenda_create_manual_screen_styles.field_label}>
-          Colores
-        </Text>
-
-        <View style={prenda_create_manual_screen_styles.color_input_row}>
-          <View style={prenda_create_manual_screen_styles.color_input_wrap}>
-            <TextInput
-              value={color_query}
-              onChangeText={set_color_query}
-              placeholder="Escribe un color"
-              placeholderTextColor={palette.text_muted}
-              style={prenda_create_manual_screen_styles.color_input}
-              onSubmitEditing={add_color_from_input}
-              returnKeyType="done"
-            />
-          </View>
-          <Pressable onPress={add_color_from_input} style={prenda_create_manual_screen_styles.color_add_button}>
-            <Text selectable style={prenda_create_manual_screen_styles.color_add_button_text}>
-              Añadir
+        <View style={prenda_create_manual_screen_styles.header_row}>
+          <Pressable onPress={() => router.back()} style={prenda_create_manual_screen_styles.header_action}>
+            <Text selectable style={prenda_create_manual_screen_styles.header_action_text}>
+              Cancelar
             </Text>
           </Pressable>
+          <Text selectable style={prenda_create_manual_screen_styles.header_title}>
+            {screen_title}
+          </Text>
+          <View style={prenda_create_manual_screen_styles.header_action} />
         </View>
 
-        {colores_status === 'loading' && (
-          <View style={prenda_create_manual_screen_styles.loading_state}>
-            <ActivityIndicator size="small" color={palette.walnut} />
-            <Text selectable style={prenda_create_manual_screen_styles.loading_text}>
-              Cargando colores...
-            </Text>
-          </View>
-        )}
+        <View style={prenda_create_manual_screen_styles.photo_card}>
+          {visual_image_uri ? (
+            <Image
+              source={{ uri: visual_image_uri }}
+              style={[
+                prenda_create_manual_screen_styles.photo_image,
+                { aspectRatio: photo_aspect_ratio || 1 },
+              ]}
+              resizeMode="contain"
+              onLoad={(event) => {
+                const { width, height } = event.nativeEvent?.source ?? {};
+                if (width && height) {
+                  set_photo_aspect_ratio(width / height);
+                }
+              }}
+            />
+          ) : (
+            <View style={prenda_create_manual_screen_styles.photo_placeholder}>
+              <View style={prenda_create_manual_screen_styles.photo_icon_wrap}>
+                <FontAwesome6 name="image" size={18} color={palette.walnut} />
+              </View>
+              <Text selectable style={prenda_create_manual_screen_styles.photo_placeholder_text}>
+                Añadir foto de la prenda
+              </Text>
+            </View>
+          )}
 
-        {colores_status !== 'loading' && color_suggestions.length > 0 && (
-          <View style={prenda_create_manual_screen_styles.suggestions_wrap}>
-            {color_suggestions.map((color_item) => {
-              const color_id_key = String(color_item?.id ?? '');
+          <View style={prenda_create_manual_screen_styles.photo_actions_row}>
+            <Pressable
+              onPress={pick_image_from_camera}
+              style={prenda_create_manual_screen_styles.photo_action_button}
+            >
+              <Text selectable style={prenda_create_manual_screen_styles.photo_action_button_text}>
+                Cámara
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={pick_image_from_gallery}
+              style={prenda_create_manual_screen_styles.photo_action_button}
+            >
+              <FontAwesome6 name="image" size={13} color={palette.walnut} />
+              <Text selectable style={prenda_create_manual_screen_styles.photo_action_button_text}>
+                Galería
+              </Text>
+            </Pressable>
+          </View>
+
+          {visual_image_uri ? (
+            <Pressable
+              onPress={clear_selected_image}
+              style={prenda_create_manual_screen_styles.photo_clear_button}
+            >
+              <Text selectable style={prenda_create_manual_screen_styles.photo_clear_button_text}>
+                Quitar foto
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+
+        <View style={prenda_create_manual_screen_styles.section}>
+          <Text selectable style={prenda_create_manual_screen_styles.section_label}>
+            NOMBRE
+          </Text>
+          <View style={prenda_create_manual_screen_styles.input_card}>
+            <TextInput
+              value={nombre}
+              onChangeText={set_nombre}
+              placeholder="Ej: Camisa Oxford"
+              placeholderTextColor={palette.text_muted}
+              style={prenda_create_manual_screen_styles.input}
+            />
+          </View>
+        </View>
+
+        <View style={prenda_create_manual_screen_styles.section}>
+          <Text selectable style={prenda_create_manual_screen_styles.section_label}>
+            TIPO DE PRENDA
+          </Text>
+          <View style={prenda_create_manual_screen_styles.type_grid}>
+            {tipo_prenda_options.map((option) => {
+              const is_active = option.value === selected_tipo_option;
               return (
                 <Pressable
-                  key={`suggestion-color-${color_id_key}`}
-                  onPress={() => add_color_chip_from_name(color_item?.nombre, color_item?.id)}
-                  style={prenda_create_manual_screen_styles.suggestion_item}
+                  key={`tipo-${option.value}`}
+                  onPress={() => handle_select_tipo(option)}
+                  style={[
+                    prenda_create_manual_screen_styles.type_card,
+                    is_active ? prenda_create_manual_screen_styles.type_card_active : null,
+                  ]}
                 >
-                  <Text selectable style={prenda_create_manual_screen_styles.suggestion_item_text}>
-                    {String(color_item?.nombre ?? '')}
+                  <FontAwesome6
+                    name={option.icon}
+                    size={18}
+                    color={is_active ? palette.white : palette.walnut}
+                    style={prenda_create_manual_screen_styles.type_icon}
+                  />
+                  <Text
+                    selectable
+                    style={[
+                      prenda_create_manual_screen_styles.type_label,
+                      is_active ? prenda_create_manual_screen_styles.type_label_active : null,
+                    ]}
+                  >
+                    {option.label}
                   </Text>
                 </Pressable>
               );
             })}
           </View>
-        )}
 
-        {selected_colors.length > 0 && (
-          <View style={prenda_create_manual_screen_styles.chips_wrap}>
-            {selected_colors.map((color_item) => (
-              <View key={`selected-color-${color_item.normalized_name}`} style={prenda_create_manual_screen_styles.selected_color_chip}>
-                <Text selectable style={prenda_create_manual_screen_styles.selected_color_chip_text}>
-                  {color_item.name}
-                </Text>
+          {selected_tipo_option === 'otro' && (
+            <View style={prenda_create_manual_screen_styles.custom_type_input_wrap}>
+              <TextInput
+                value={custom_tipo_prenda}
+                onChangeText={handle_custom_tipo_change}
+                placeholder="Escribe el tipo"
+                placeholderTextColor={palette.text_muted}
+                style={prenda_create_manual_screen_styles.input}
+              />
+            </View>
+          )}
+        </View>
+
+        <View style={prenda_create_manual_screen_styles.section}>
+          <View style={prenda_create_manual_screen_styles.section_header_row}>
+            <Text selectable style={prenda_create_manual_screen_styles.section_label}>
+              ELEGANCIA
+            </Text>
+            <Text selectable style={prenda_create_manual_screen_styles.section_hint}>
+              {elegance_label}
+            </Text>
+          </View>
+          <View style={prenda_create_manual_screen_styles.level_row}>
+            {[1, 2, 3, 4, 5].map((level_value) => {
+              const is_active = nivel_elegancia != null && level_value <= nivel_elegancia;
+              return (
                 <Pressable
-                  onPress={() => remove_selected_color(color_item.normalized_name)}
-                  style={prenda_create_manual_screen_styles.selected_color_chip_remove_button}
-                >
-                  <FontAwesome6 name="xmark" size={10} color={palette.white} />
+                  key={`elegance-${level_value}`}
+                  onPress={() => set_nivel_elegancia(level_value === nivel_elegancia ? null : level_value)}
+                  style={[
+                    prenda_create_manual_screen_styles.level_pill,
+                    is_active ? prenda_create_manual_screen_styles.level_pill_active : null,
+                  ]}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={prenda_create_manual_screen_styles.section}>
+          <View style={prenda_create_manual_screen_styles.section_header_row}>
+            <Text selectable style={prenda_create_manual_screen_styles.section_label}>
+              ABRIGO
+            </Text>
+            <Text selectable style={prenda_create_manual_screen_styles.section_hint}>
+              {warmth_label}
+            </Text>
+          </View>
+          <View style={prenda_create_manual_screen_styles.level_row}>
+            {[1, 2, 3, 4, 5].map((level_value) => {
+              const is_active = nivel_abrigo != null && level_value <= nivel_abrigo;
+              return (
+                <Pressable
+                  key={`warmth-${level_value}`}
+                  onPress={() => set_nivel_abrigo(level_value === nivel_abrigo ? null : level_value)}
+                  style={[
+                    prenda_create_manual_screen_styles.level_pill,
+                    is_active ? prenda_create_manual_screen_styles.level_pill_active_warmth : null,
+                  ]}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={prenda_create_manual_screen_styles.section}>
+          <View style={prenda_create_manual_screen_styles.section_header_row}>
+            <Text selectable style={prenda_create_manual_screen_styles.section_label}>
+              COLORES
+            </Text>
+            <Text selectable style={prenda_create_manual_screen_styles.section_hint}>
+              {selected_color_count_label}
+            </Text>
+          </View>
+          <View style={prenda_create_manual_screen_styles.colors_card}>
+            {colores_status === 'loading' && (
+              <View style={prenda_create_manual_screen_styles.loading_state}>
+                <ActivityIndicator size="small" color={palette.walnut} />
+                <Text selectable style={prenda_create_manual_screen_styles.loading_text}>
+                  Cargando colores...
+                </Text>
+              </View>
+            )}
+
+            <View style={prenda_create_manual_screen_styles.colors_grid}>
+              {common_color_options.map((color_item) => {
+                const normalized_name = normalize_text(color_item.name);
+                const is_selected = selected_color_name_set.has(normalized_name);
+                return (
+                  <Pressable
+                    key={`color-${color_item.name}`}
+                    onPress={() => toggle_common_color(color_item.name)}
+                    style={prenda_create_manual_screen_styles.color_item}
+                  >
+                    <View
+                      style={[
+                        prenda_create_manual_screen_styles.color_swatch,
+                        { backgroundColor: color_item.swatch },
+                        is_selected ? prenda_create_manual_screen_styles.color_swatch_selected : null,
+                      ]}
+                    >
+                      {is_selected ? (
+                        <FontAwesome6 name="check" size={12} color={palette.white} />
+                      ) : null}
+                    </View>
+                    <Text selectable style={prenda_create_manual_screen_styles.color_label}>
+                      {color_item.name}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Pressable
+              onPress={() => set_is_custom_color_open((is_open) => !is_open)}
+              style={prenda_create_manual_screen_styles.custom_color_button}
+            >
+              <FontAwesome6 name="plus" size={12} color={palette.sky_ink} />
+              <Text selectable style={prenda_create_manual_screen_styles.custom_color_button_text}>
+                Color personalizado
+              </Text>
+            </Pressable>
+
+            {is_custom_color_open && (
+              <View style={prenda_create_manual_screen_styles.color_input_row}>
+                <View style={prenda_create_manual_screen_styles.color_input_wrap}>
+                  <TextInput
+                    value={color_query}
+                    onChangeText={set_color_query}
+                    placeholder="Escribe un color"
+                    placeholderTextColor={palette.text_muted}
+                    style={prenda_create_manual_screen_styles.color_input}
+                    onSubmitEditing={add_color_from_input}
+                    returnKeyType="done"
+                  />
+                </View>
+                <Pressable onPress={add_color_from_input} style={prenda_create_manual_screen_styles.color_add_button}>
+                  <Text selectable style={prenda_create_manual_screen_styles.color_add_button_text}>
+                    Añadir
+                  </Text>
                 </Pressable>
               </View>
-            ))}
+            )}
+
+            {extra_selected_colors.length > 0 && (
+              <View style={prenda_create_manual_screen_styles.chips_wrap}>
+                {extra_selected_colors.map((color_item) => (
+                  <View
+                    key={`selected-color-${color_item.normalized_name}`}
+                    style={prenda_create_manual_screen_styles.selected_color_chip}
+                  >
+                    <Text selectable style={prenda_create_manual_screen_styles.selected_color_chip_text}>
+                      {color_item.name}
+                    </Text>
+                    <Pressable
+                      onPress={() => remove_selected_color(color_item.normalized_name)}
+                      style={prenda_create_manual_screen_styles.selected_color_chip_remove_button}
+                    >
+                      <FontAwesome6 name="xmark" size={10} color={palette.white} />
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        </View>
+
+        {Boolean(visible_error) && (
+          <View style={prenda_create_manual_screen_styles.error_banner}>
+            <Text selectable style={prenda_create_manual_screen_styles.error_text}>
+              {visible_error}
+            </Text>
           </View>
         )}
-
-        <Text selectable style={prenda_create_manual_screen_styles.helper_text}>
-          Escribe colores y pulsa sugerencias o Añadir para crear tus chips.
-        </Text>
-      </View>
-
-      {Boolean(visible_error) && (
-        <View style={prenda_create_manual_screen_styles.error_banner}>
-          <Text selectable style={prenda_create_manual_screen_styles.error_text}>
-            {visible_error}
-          </Text>
-        </View>
-      )}
 
         <Pressable
           onPress={handle_submit}

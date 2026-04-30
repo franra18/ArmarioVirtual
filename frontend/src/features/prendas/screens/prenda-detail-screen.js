@@ -152,8 +152,8 @@ const warmth_level_labels = {
   1: 'Muy Ligero',
   2: 'Ligero',
   3: 'Intermedio',
-  4: 'Cálido',
-  5: 'Protección Total',
+  4: 'Abrigado',
+  5: 'Muy abrigado',
 };
 
 function format_date(date_string) {
