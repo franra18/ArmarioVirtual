@@ -330,11 +330,12 @@ export const prendas_screen_styles = StyleSheet.create({
   add_options_title: {
     color: palette.walnut_deep,
     fontFamily: typography.body_medium,
-    fontSize: 15,
+    fontSize: 16,
+    marginBottom: 4,
   },
   add_options_button_primary: {
     minHeight: 42,
-    borderRadius: 14,
+    borderRadius: 50,
     borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
@@ -347,7 +348,7 @@ export const prendas_screen_styles = StyleSheet.create({
   },
   add_options_button_disabled: {
     minHeight: 42,
-    borderRadius: 14,
+    borderRadius: 50,
     borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
@@ -357,13 +358,13 @@ export const prendas_screen_styles = StyleSheet.create({
   },
   add_options_button_ia: {
     minHeight: 42,
-    borderRadius: 14,
+    borderRadius: 50,
     borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.cream_deep,
-    borderWidth: 1,
-    borderColor: palette.sky_deep,
+    backgroundColor: palette.sky,
+    flexDirection: 'row',
+    gap: 9,
   },
   add_options_button_disabled_text: {
     color: palette.text_muted,
@@ -372,11 +373,8 @@ export const prendas_screen_styles = StyleSheet.create({
   },
   add_options_button_secondary: {
     minHeight: 40,
-    borderRadius: 14,
-    borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.cream_deep,
   },
   add_options_button_secondary_text: {
     color: palette.walnut,
@@ -384,7 +382,7 @@ export const prendas_screen_styles = StyleSheet.create({
     fontSize: 14,
   },
   add_options_button_ia_text: {
-    color: palette.walnut,
+    color: palette.walnut_deep,
     fontFamily: typography.body_medium,
     fontSize: 14,
   },

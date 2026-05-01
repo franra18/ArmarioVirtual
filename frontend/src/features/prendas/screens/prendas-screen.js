@@ -21,6 +21,7 @@ import {
   select_prendas_status,
 } from '../selectors/prendas-selectors';
 import { prendas_screen_styles, search_input_placeholder_color } from './prendas-screen.styles';
+import { SparklesIcon } from '../../../shared/icons/app-icons';
 
 const elegance_level_options = [
   { value: null, label: 'Todos' },
@@ -628,6 +629,7 @@ export function PrendasScreen() {
             </Pressable>
 
             <Pressable onPress={handle_select_ia_add} style={prendas_screen_styles.add_options_button_ia}>
+              <SparklesIcon color={palette.walnut_deep} size={13} />
               <Text selectable style={prendas_screen_styles.add_options_button_ia_text}>
                 Desde foto con IA
               </Text>
