@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { delete_outfit_from_backend, fetch_outfits_from_backend } from '../api/outfits-api';
+import { create_outfit_in_backend, delete_outfit_from_backend, fetch_outfits_from_backend, update_outfit_in_backend } from '../api/outfits-api';
 
 export const fetch_outfits_for_user = createAsyncThunk(
   'outfits/fetch_outfits_for_user',
@@ -32,6 +32,30 @@ export const delete_outfit_by_id = createAsyncThunk(
   }
 );
 
+export const create_outfit_manual = createAsyncThunk(
+  'outfits/create_outfit_manual',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const created_outfit = await create_outfit_in_backend(payload);
+      return created_outfit;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo crear el outfit');
+    }
+  }
+);
+
+export const update_outfit_manual = createAsyncThunk(
+  'outfits/update_outfit_manual',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const updated_outfit = await update_outfit_in_backend(payload.outfit_id, payload);
+      return updated_outfit;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo actualizar el outfit');
+    }
+  }
+);
+
 const initial_state = {
   items: [],
   favorite_ids: [],
@@ -40,6 +64,8 @@ const initial_state = {
   loaded_user_id: null,
   delete_status: 'idle',
   delete_error: null,
+  create_status: 'idle',
+  create_error: null,
 };
 
 const outfits_slice = createSlice({
@@ -68,6 +94,8 @@ const outfits_slice = createSlice({
       state.loaded_user_id = null;
       state.delete_status = 'idle';
       state.delete_error = null;
+      state.create_status = 'idle';
+      state.create_error = null;
     },
   },
   extraReducers: (builder) => {
@@ -105,6 +133,34 @@ const outfits_slice = createSlice({
       .addCase(delete_outfit_by_id.rejected, (state, action) => {
         state.delete_status = 'failed';
         state.delete_error = action.payload ?? 'No se pudo eliminar el outfit';
+      });
+    builder
+      .addCase(create_outfit_manual.pending, (state) => {
+        state.create_status = 'loading';
+        state.create_error = null;
+      })
+      .addCase(create_outfit_manual.fulfilled, (state, action) => {
+        state.create_status = 'succeeded';
+        state.create_error = null;
+        state.items = [action.payload, ...state.items];
+      })
+      .addCase(create_outfit_manual.rejected, (state, action) => {
+        state.create_status = 'failed';
+        state.create_error = action.payload ?? 'No se pudo crear el outfit';
+      });
+    builder
+      .addCase(update_outfit_manual.pending, (state) => {
+        state.create_status = 'loading';
+        state.create_error = null;
+      })
+      .addCase(update_outfit_manual.fulfilled, (state, action) => {
+        state.create_status = 'succeeded';
+        state.create_error = null;
+        state.items = state.items.map((outfit) => (String(outfit?.id) === String(action.payload?.id) ? action.payload : outfit));
+      })
+      .addCase(update_outfit_manual.rejected, (state, action) => {
+        state.create_status = 'failed';
+        state.create_error = action.payload ?? 'No se pudo actualizar el outfit';
       });
   },
 });

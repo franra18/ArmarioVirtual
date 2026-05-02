@@ -5,3 +5,5 @@ export const select_outfits_error = (state) => state.outfits.error;
 export const select_outfits_loaded_user_id = (state) => state.outfits.loaded_user_id;
 export const select_outfits_delete_status = (state) => state.outfits.delete_status;
 export const select_outfits_delete_error = (state) => state.outfits.delete_error;
+export const select_outfits_create_status = (state) => state.outfits.create_status;
+export const select_outfits_create_error = (state) => state.outfits.create_error;

@@ -265,7 +265,10 @@ export function OutfitsScreen() {
                 />
               </Pressable>
 
-              <Pressable style={outfits_screen_styles.add_button}>
+              <Pressable
+                onPress={() => router.push('/conjuntos/nuevo')}
+                style={outfits_screen_styles.add_button}
+              >
                 <Text selectable style={outfits_screen_styles.add_button_text}>
                   + Añadir
                 </Text>

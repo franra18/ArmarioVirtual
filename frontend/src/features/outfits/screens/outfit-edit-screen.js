@@ -1,23 +1,23 @@
-import { Pressable, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { outfit_edit_screen_styles } from './outfit-edit-screen.styles';
+import { useMemo } from 'react';
+import { View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { use_app_selector } from '../../../store/hooks';
+import { select_outfits_items } from '../selectors/outfits-selectors';
+import { OutfitCreateScreen } from './outfit-create-screen';
 
 export function OutfitEditScreen() {
-  const router = useRouter();
-
-  return (
-    <View style={outfit_edit_screen_styles.screen}>
-      <Text selectable style={outfit_edit_screen_styles.title}>
-        Edición de conjunto
-      </Text>
-      <Text selectable style={outfit_edit_screen_styles.subtitle}>
-        Esta pantalla estará disponible pronto.
-      </Text>
-      <Pressable onPress={() => router.back()} style={outfit_edit_screen_styles.back_button}>
-        <Text selectable style={outfit_edit_screen_styles.back_button_text}>
-          Volver
-        </Text>
-      </Pressable>
-    </View>
+  const { outfit_id } = useLocalSearchParams();
+  const outfits = use_app_selector(select_outfits_items);
+  
+  const outfit = useMemo(
+    () => outfits.find((item) => String(item?.id) === String(outfit_id ?? '')),
+    [outfits, outfit_id]
   );
+
+  // Si no carga rápido, no renderizamos nada (o podrías poner un ActivityIndicator)
+  if (!outfit) {
+    return <View style={{ flex: 1 }} />;
+  }
+
+  return <OutfitCreateScreen outfit_to_edit={outfit} />;
 }
