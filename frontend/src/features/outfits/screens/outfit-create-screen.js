@@ -86,6 +86,10 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
 
   const [nombre_outfit, set_nombre_outfit] = useState('');
   const [ocasion, set_ocasion] = useState('');
+
+  const [is_custom_ocasion, set_is_custom_ocasion] = useState(false);
+  const [custom_ocasion, set_custom_ocasion] = useState('');
+
   const [selected_prenda_ids, set_selected_prenda_ids] = useState([]);
   const [is_selector_open, set_is_selector_open] = useState(false);
   const [selector_search, set_selector_search] = useState('');
@@ -112,8 +116,20 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
   useEffect(() => {
     if (is_editing) {
       set_nombre_outfit(outfit_to_edit.nombre_outfit || '');
-      set_ocasion(outfit_to_edit.ocasion || '');
       set_selected_prenda_ids(outfit_to_edit.prenda_ids || []);
+
+      const loaded_ocasion = outfit_to_edit.ocasion || '';
+      set_ocasion(loaded_ocasion);
+
+      // Detectamos si la ocasión es personalizada
+      const is_predefined = occasion_options.some(opt =>
+        normalize_prenda_text(opt) === normalize_prenda_text(loaded_ocasion)
+      );
+
+      if (!is_predefined && loaded_ocasion) {
+        set_is_custom_ocasion(true);
+        set_custom_ocasion(loaded_ocasion);
+      }
     }
   }, [outfit_to_edit, is_editing]);
 
@@ -232,10 +248,7 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
         const created_outfit = await dispatch(create_outfit_manual(payload)).unwrap();
         router.replace(`/conjuntos/${created_outfit.id}`);
       }
-    }  catch (error) {
-      // AÑADE ESTE CONSOLE.LOG:
-      console.log("Error detallado al actualizar:", error); 
-      
+    } catch (error) {
       set_local_error(error?.message ?? (is_editing ? 'No se pudo actualizar el conjunto' : 'No se pudo crear el conjunto'));
     } finally {
       set_is_processing_submission(false);
@@ -269,9 +282,12 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
               Cancelar
             </Text>
           </Pressable>
+
           <Text selectable style={outfit_create_screen_styles.header_title}>
             {is_editing ? 'Editar conjunto' : 'Nuevo conjunto'}
           </Text>
+
+          <View style={outfit_create_screen_styles.header_action} />
         </View>
 
         <View style={outfit_create_screen_styles.section}>
@@ -304,11 +320,14 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
 
           <View style={outfit_create_screen_styles.chips_row}>
             {occasion_options.map((option) => {
-              const is_active = normalize_prenda_text(option) === normalize_prenda_text(ocasion);
+              const is_active = !is_custom_ocasion && normalize_prenda_text(option) === normalize_prenda_text(ocasion);
               return (
                 <Pressable
                   key={option}
-                  onPress={() => set_ocasion(is_active ? '' : option)}
+                  onPress={() => {
+                    set_is_custom_ocasion(false);
+                    set_ocasion(is_active ? '' : option);
+                  }}
                   style={[
                     outfit_create_screen_styles.chip,
                     is_active ? outfit_create_screen_styles.chip_active : null,
@@ -326,7 +345,46 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
                 </Pressable>
               );
             })}
+
+            {/* Nuevo chip para "+ Otro" */}
+            <Pressable
+              onPress={() => {
+                set_is_custom_ocasion(true);
+                set_ocasion(custom_ocasion); // Sincroniza con lo que haya escrito
+              }}
+              style={[
+                outfit_create_screen_styles.chip,
+                is_custom_ocasion ? outfit_create_screen_styles.chip_active : null,
+              ]}
+            >
+              <Text
+                selectable
+                style={[
+                  outfit_create_screen_styles.chip_text,
+                  is_custom_ocasion ? outfit_create_screen_styles.chip_text_active : null,
+                ]}
+              >
+                + Otro
+              </Text>
+            </Pressable>
           </View>
+
+          {/* Input condicional para la ocasión personalizada usando tus estilos existentes */}
+          {is_custom_ocasion && (
+            <View style={[outfit_create_screen_styles.input_card, { marginTop: 8 }]}>
+              <TextInput
+                value={custom_ocasion}
+                onChangeText={(val) => {
+                  set_custom_ocasion(val);
+                  set_ocasion(val); // Guarda directamente en el estado que se enviará al backend
+                }}
+                style={outfit_create_screen_styles.input}
+                placeholder="Escribe la ocasión"
+                placeholderTextColor={palette.text_muted}
+                returnKeyType="done"
+              />
+            </View>
+          )}
         </View>
 
         <View style={outfit_create_screen_styles.section}>

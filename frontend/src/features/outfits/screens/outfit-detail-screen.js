@@ -245,7 +245,7 @@ export function OutfitDetailScreen() {
                 </View>
 
                 <Text selectable style={outfit_detail_screen_styles.title}>
-                    {outfit?.nombre_outfit ?? 'Conjunto'}
+                    {outfit?.nombre_outfit ?? `Conjunto ${outfit?.id ?? ''}`}
                 </Text>
 
                 <View style={outfit_detail_screen_styles.chip_row}>
