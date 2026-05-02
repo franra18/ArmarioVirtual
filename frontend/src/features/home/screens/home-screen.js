@@ -170,25 +170,29 @@ export function HomeScreen() {
       </View>
 
       <View style={home_screen_styles.weather_card}>
-        <View style={home_screen_styles.weather_left}>
-          <SunIcon color={palette.walnut_soft} size={31} />
-          <View>
+        
+        <View style={home_screen_styles.weather_top_row}>
+          <View style={home_screen_styles.weather_temp_container}>
+            <SunIcon color={palette.walnut_soft} size={31} />
             <Text selectable style={home_screen_styles.weather_temp_text}>
               {weather_temp_text}
             </Text>
-            <Text selectable style={home_screen_styles.weather_desc_text}>
-              {weather_desc_text}
+          </View>
+          
+          <View style={home_screen_styles.weather_hint_container}>
+            <Text selectable style={home_screen_styles.weather_day_text}>
+              Hoy:
+            </Text>
+            <Text selectable style={home_screen_styles.weather_hint_text}>
+              {weather_hint_text}
             </Text>
           </View>
         </View>
-        <View style={home_screen_styles.weather_right}>
-          <Text selectable style={home_screen_styles.weather_day_text}>
-            Hoy
-          </Text>
-          <Text selectable style={home_screen_styles.weather_hint_text}>
-            {weather_hint_text}
-          </Text>
-        </View>
+
+        <Text selectable style={home_screen_styles.weather_desc_text}>
+          {weather_desc_text}
+        </Text>
+
       </View>
 
       <View style={home_screen_styles.wardrobe_section}>

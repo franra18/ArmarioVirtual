@@ -35,14 +35,14 @@ const elegance_level_labels = ['Deportivo/Casa', 'Casual', 'Casual Elegante', 'S
 const warmth_level_labels = ['Muy ligero', 'Ligero', 'Intermedio', 'Abrigado', 'Muy abrigado'];
 
 const common_color_options = [
-  { name: 'Azul', swatch: '#3E5E8C' },
-  { name: 'Cielo', swatch: '#8DB5D2' },
-  { name: 'Crudo', swatch: '#EFE5D5' },
-  { name: 'Cuero', swatch: '#7B4E2F' },
-  { name: 'Negro', swatch: '#2B1F17' },
-  { name: 'Rojo', swatch: '#B4503E' },
-  { name: 'Verde', swatch: '#5E7D55' },
-  { name: 'Mostaza', swatch: '#D5B357' },
+  { name: 'Azul', swatch: '#1a5fad' },
+  { name: 'Blanco', swatch: '#ffffff' },
+  { name: 'Beige', swatch: '#EFE5D5' },
+  { name: 'Marrón', swatch: '#7B4E2F' },
+  { name: 'Negro', swatch: '#000000' },
+  { name: 'Rojo', swatch: '#ff2600' },
+  { name: 'Verde', swatch: '#108b00' },
+  { name: 'Amarillo', swatch: '#FFD700' },
 ];
 
 function normalize_text(value) {
