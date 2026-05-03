@@ -17,6 +17,11 @@ import {
   ShirtIcon,
   SparklesIcon,
   SunIcon,
+  CloudIcon,
+  CloudSunIcon,
+  CloudRainIcon,
+  SnowflakeIcon,
+  BoltIcon,
   ConjuntosIcon,
 } from '../../../shared/icons/app-icons';
 import { palette } from '../../../shared/theme/palette';
@@ -39,6 +44,32 @@ function capitalize_text(value) {
   }
 
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function WeatherIconSelector({ descripcion, color, size }) {
+  const desc = String(descripcion ?? '').toLowerCase();
+
+  // Si está lloviendo o hay tormenta
+  if (desc.includes('tormenta') || desc.includes('trueno') || desc.includes('rayo')) {
+    return <BoltIcon color={color} size={size} />;
+  }
+  if (desc.includes('lluvia') || desc.includes('llovizna') || desc.includes('aguacero') || desc.includes('chubasco')) {
+    return <CloudRainIcon color={color} size={size} />;
+  }
+  // Si hace frío extremo
+  if (desc.includes('nieve') || desc.includes('nevada')) {
+    return <SnowflakeIcon color={color} size={size} />;
+  }
+  // Si hay nubes
+  if (desc.includes('nublado') || desc.includes('nubes') || desc.includes('nuboso') || desc.includes('niebla')) {
+    if (desc.includes('poco') || desc.includes('parcialmente') || desc.includes('dispersas')) {
+      return <CloudSunIcon color={color} size={size} />;
+    }
+    return <CloudIcon color={color} size={size} />;
+  }
+
+  // Por defecto (Despejado, soleado, o si está cargando)
+  return <SunIcon color={color} size={size} />;
 }
 
 export function HomeScreen() {
@@ -170,15 +201,19 @@ export function HomeScreen() {
       </View>
 
       <View style={home_screen_styles.weather_card}>
-        
+
         <View style={home_screen_styles.weather_top_row}>
           <View style={home_screen_styles.weather_temp_container}>
-            <SunIcon color={palette.walnut_soft} size={31} />
+            <WeatherIconSelector
+              descripcion={weather_data?.descripcion}
+              color={palette.walnut_soft}
+              size={31}
+            />
             <Text selectable style={home_screen_styles.weather_temp_text}>
               {weather_temp_text}
             </Text>
           </View>
-          
+
           <View style={home_screen_styles.weather_hint_container}>
             <Text selectable style={home_screen_styles.weather_day_text}>
               Hoy:

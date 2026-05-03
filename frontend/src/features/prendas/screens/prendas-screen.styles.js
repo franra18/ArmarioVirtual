@@ -93,10 +93,41 @@ export const prendas_screen_styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.7,
   },
+  filter_header_row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  filter_value: {
+    color: palette.text_muted,
+    fontFamily: typography.body,
+    fontSize: 12,
+  },
+  level_row: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 6,
+    marginBottom: 6,
+  },
+  level_pill: {
+    flex: 1,
+    height: 20,
+    borderRadius: 10,
+    borderCurve: 'continuous',
+    // Usamos el fondo claro porque el contenedor de filtros ya es oscuro
+    backgroundColor: palette.cream, 
+  },
+  level_pill_active_elegance: {
+    backgroundColor: palette.walnut,
+  },
+  level_pill_active_warmth: {
+    backgroundColor: palette.sky_ink,
+  },
   filter_choice_row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    marginBottom: 6,
   },
   filter_choice_chip: {
     borderRadius: 14,
@@ -133,51 +164,6 @@ export const prendas_screen_styles = StyleSheet.create({
     color: palette.walnut,
     fontFamily: typography.body,
     fontSize: 14,
-  },
-  select_trigger: {
-    minHeight: 40,
-    borderRadius: 14,
-    borderCurve: 'continuous',
-    backgroundColor: palette.cream,
-    borderWidth: 1,
-    borderColor: palette.sky_deep,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 8,
-  },
-  select_trigger_text: {
-    flex: 1,
-    color: palette.walnut,
-    fontFamily: typography.body,
-    fontSize: 14,
-  },
-  select_dropdown: {
-    marginTop: 6,
-    borderRadius: 14,
-    borderCurve: 'continuous',
-    backgroundColor: palette.cream,
-    borderWidth: 1,
-    borderColor: palette.sky_deep,
-    overflow: 'hidden',
-  },
-  select_option: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  select_option_active: {
-    backgroundColor: palette.walnut,
-  },
-  select_option_text: {
-    color: palette.walnut,
-    fontFamily: typography.body,
-    fontSize: 13,
-  },
-  select_option_text_active: {
-    color: palette.white,
-    fontFamily: typography.body_medium,
   },
   filter_actions_row: {
     flexDirection: 'row',

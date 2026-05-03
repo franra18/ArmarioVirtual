@@ -271,7 +271,7 @@ export function OutfitDetailScreen() {
 
                 <View style={outfit_detail_screen_styles.section_header}>
                     <Text selectable style={outfit_detail_screen_styles.section_title}>
-                        Capas
+                        Prendas:
                     </Text>
                     <Text selectable style={outfit_detail_screen_styles.section_count}>
                         {prenda_ids.length} prendas

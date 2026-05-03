@@ -55,3 +55,23 @@ export function ChevronRightIcon({ color, size = 16 }) {
 export function BackIcon({ color, size = 16 }) {
   return <FontAwesome6 name="chevron-left" size={size} color={color} />;
 }
+
+export function CloudIcon({ color, size = 24 }) {
+  return <FontAwesome6 name="cloud" size={size} color={color} />;
+}
+
+export function CloudSunIcon({ color, size = 24 }) {
+  return <FontAwesome6 name="cloud-sun" size={size} color={color} />;
+}
+
+export function CloudRainIcon({ color, size = 24 }) {
+  return <FontAwesome6 name="cloud-showers-heavy" size={size} color={color} />;
+}
+
+export function SnowflakeIcon({ color, size = 24 }) {
+  return <FontAwesome6 name="snowflake" size={size} color={color} />;
+}
+
+export function BoltIcon({ color, size = 24 }) {
+  return <FontAwesome6 name="cloud-bolt" size={size} color={color} />;
+}

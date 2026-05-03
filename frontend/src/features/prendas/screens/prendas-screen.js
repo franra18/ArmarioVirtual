@@ -25,20 +25,20 @@ import { SparklesIcon } from '../../../shared/icons/app-icons';
 
 const elegance_level_options = [
   { value: null, label: 'Todos' },
-  { value: 1, label: '1 · Deportivo/Casa' },
-  { value: 2, label: '2 · Informal/Casual' },
-  { value: 3, label: '3 · Casual Elegante' },
-  { value: 4, label: '4 · Semi-formal' },
-  { value: 5, label: '5 · Formal/Gala' },
+  { value: 1, label: 'Deportivo/Casa' },
+  { value: 2, label: 'Casual' },
+  { value: 3, label: 'Casual Elegante' },
+  { value: 4, label: 'Semi-formal' },
+  { value: 5, label: 'Formal' },
 ];
 
 const warmth_level_options = [
   { value: null, label: 'Todos' },
-  { value: 1, label: '1 · Muy Ligero' },
-  { value: 2, label: '2 · Ligero' },
-  { value: 3, label: '3 · Intermedio' },
-  { value: 4, label: '4 · Cálido' },
-  { value: 5, label: '5 · Protección Total' },
+  { value: 1, label: 'Muy ligero' },
+  { value: 2, label: 'Ligero' },
+  { value: 3, label: 'Intermedio' },
+  { value: 4, label: 'Abrigado' },
+  { value: 5, label: 'Muy abrigado' },
 ];
 
 function get_selected_option_label(options, selected_value) {
@@ -101,9 +101,7 @@ export function PrendasScreen() {
   const [added_sort_order, set_added_sort_order] = useState('newest');
   const [selected_elegance_level, set_selected_elegance_level] = useState(null);
   const [selected_warmth_level, set_selected_warmth_level] = useState(null);
-  const [is_elegance_select_open, set_is_elegance_select_open] = useState(false);
-  const [is_warmth_select_open, set_is_warmth_select_open] = useState(false);
-
+  
   useEffect(() => {
     if (!auth_user_id || prendas_status === 'loading') {
       return;
@@ -253,8 +251,6 @@ export function PrendasScreen() {
   const toggle_filter_card = () => {
     set_is_add_options_open(false);
     set_is_filter_card_open((is_open) => !is_open);
-    set_is_elegance_select_open(false);
-    set_is_warmth_select_open(false);
   };
 
   const open_add_options = () => {
@@ -276,16 +272,6 @@ export function PrendasScreen() {
   const handle_select_ia_add = () => {
     set_is_add_options_open(false);
     router.push('/prendas/nueva-ia');
-  };
-
-  const select_elegance_level = (level_value) => {
-    set_selected_elegance_level(level_value);
-    set_is_elegance_select_open(false);
-  };
-
-  const select_warmth_level = (level_value) => {
-    set_selected_warmth_level(level_value);
-    set_is_warmth_select_open(false);
   };
 
   if (!auth_user_id) {
@@ -429,101 +415,55 @@ export function PrendasScreen() {
                 </View>
 
                 <View style={prendas_screen_styles.filter_section}>
-                  <Text selectable style={prendas_screen_styles.filter_label}>
-                    Nivel de elegancia
-                  </Text>
-                  <Pressable
-                    onPress={() => {
-                      set_is_elegance_select_open((is_open) => !is_open);
-                      set_is_warmth_select_open(false);
-                    }}
-                    style={prendas_screen_styles.select_trigger}
-                  >
-                    <Text selectable style={prendas_screen_styles.select_trigger_text}>
+                  <View style={prendas_screen_styles.filter_header_row}>
+                    <Text selectable style={prendas_screen_styles.filter_label}>
+                      Nivel de elegancia
+                    </Text>
+                    <Text selectable style={prendas_screen_styles.filter_value}>
                       {get_selected_option_label(elegance_level_options, selected_elegance_level)}
                     </Text>
-                    <FontAwesome6
-                      name={is_elegance_select_open ? 'chevron-up' : 'chevron-down'}
-                      size={12}
-                      color={palette.walnut}
-                    />
-                  </Pressable>
-                  {is_elegance_select_open && (
-                    <View style={prendas_screen_styles.select_dropdown}>
-                      {elegance_level_options.map((option) => {
-                        const is_selected = option.value === selected_elegance_level;
-                        return (
-                          <Pressable
-                            key={`elegance-option-${String(option.value)}`}
-                            onPress={() => select_elegance_level(option.value)}
-                            style={[
-                              prendas_screen_styles.select_option,
-                              is_selected ? prendas_screen_styles.select_option_active : null,
-                            ]}
-                          >
-                            <Text
-                              selectable
-                              style={[
-                                prendas_screen_styles.select_option_text,
-                                is_selected ? prendas_screen_styles.select_option_text_active : null,
-                              ]}
-                            >
-                              {option.label}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  )}
+                  </View>
+                  <View style={prendas_screen_styles.level_row}>
+                    {[1, 2, 3, 4, 5].map((level_value) => {
+                      const is_active = selected_elegance_level != null && level_value <= selected_elegance_level;
+                      return (
+                        <Pressable
+                          key={`elegance-filter-${level_value}`}
+                          onPress={() => set_selected_elegance_level(level_value === selected_elegance_level ? null : level_value)}
+                          style={[
+                            prendas_screen_styles.level_pill,
+                            is_active ? prendas_screen_styles.level_pill_active_elegance : null,
+                          ]}
+                        />
+                      );
+                    })}
+                  </View>
                 </View>
 
                 <View style={prendas_screen_styles.filter_section}>
-                  <Text selectable style={prendas_screen_styles.filter_label}>
-                    Nivel de abrigo
-                  </Text>
-                  <Pressable
-                    onPress={() => {
-                      set_is_warmth_select_open((is_open) => !is_open);
-                      set_is_elegance_select_open(false);
-                    }}
-                    style={prendas_screen_styles.select_trigger}
-                  >
-                    <Text selectable style={prendas_screen_styles.select_trigger_text}>
+                  <View style={prendas_screen_styles.filter_header_row}>
+                    <Text selectable style={prendas_screen_styles.filter_label}>
+                      Nivel de abrigo
+                    </Text>
+                    <Text selectable style={prendas_screen_styles.filter_value}>
                       {get_selected_option_label(warmth_level_options, selected_warmth_level)}
                     </Text>
-                    <FontAwesome6
-                      name={is_warmth_select_open ? 'chevron-up' : 'chevron-down'}
-                      size={12}
-                      color={palette.walnut}
-                    />
-                  </Pressable>
-                  {is_warmth_select_open && (
-                    <View style={prendas_screen_styles.select_dropdown}>
-                      {warmth_level_options.map((option) => {
-                        const is_selected = option.value === selected_warmth_level;
-                        return (
-                          <Pressable
-                            key={`warmth-option-${String(option.value)}`}
-                            onPress={() => select_warmth_level(option.value)}
-                            style={[
-                              prendas_screen_styles.select_option,
-                              is_selected ? prendas_screen_styles.select_option_active : null,
-                            ]}
-                          >
-                            <Text
-                              selectable
-                              style={[
-                                prendas_screen_styles.select_option_text,
-                                is_selected ? prendas_screen_styles.select_option_text_active : null,
-                              ]}
-                            >
-                              {option.label}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  )}
+                  </View>
+                  <View style={prendas_screen_styles.level_row}>
+                    {[1, 2, 3, 4, 5].map((level_value) => {
+                      const is_active = selected_warmth_level != null && level_value <= selected_warmth_level;
+                      return (
+                        <Pressable
+                          key={`warmth-filter-${level_value}`}
+                          onPress={() => set_selected_warmth_level(level_value === selected_warmth_level ? null : level_value)}
+                          style={[
+                            prendas_screen_styles.level_pill,
+                            is_active ? prendas_screen_styles.level_pill_active_warmth : null,
+                          ]}
+                        />
+                      );
+                    })}
+                  </View>
                 </View>
 
                 <View style={prendas_screen_styles.filter_actions_row}>
