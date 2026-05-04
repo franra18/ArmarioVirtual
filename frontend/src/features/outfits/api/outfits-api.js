@@ -5,6 +5,16 @@ function parse_positive_int(value) {
   return Number.isInteger(parsed_value) && parsed_value > 0 ? parsed_value : null;
 }
 
+// Normaliza una coordenada a maximo dos decimales.
+function normalize_coordinate(value) {
+  const parsed_value = Number(value);
+  if (Number.isNaN(parsed_value)) {
+    return null;
+  }
+
+  return Number.parseFloat(parsed_value.toFixed(2));
+}
+
 function normalize_outfit_payload(payload) {
   const prenda_ids = Array.isArray(payload?.prenda_ids)
     ? payload.prenda_ids
@@ -21,6 +31,19 @@ function normalize_outfit_payload(payload) {
   };
 }
 
+// Normaliza el payload de generacion de outfit con IA.
+function normalize_outfit_ia_payload(payload) {
+  const lat = normalize_coordinate(payload?.lat);
+  const lon = normalize_coordinate(payload?.lon);
+  const has_coords = lat != null && lon != null;
+
+  return {
+    usuario_id: parse_positive_int(payload?.usuario_id),
+    prompt: String(payload?.prompt ?? '').trim(),
+    ...(has_coords ? { lat, lon } : {}),
+  };
+}
+
 function validate_outfit_payload(normalized_payload) {
   if (!normalized_payload.usuario_id) {
     throw new Error('El usuario no es valido');
@@ -28,6 +51,27 @@ function validate_outfit_payload(normalized_payload) {
 
   if (!normalized_payload.prenda_ids.length) {
     throw new Error('Debes seleccionar al menos una prenda');
+  }
+}
+
+// Valida el payload de generacion de outfit con IA.
+function validate_outfit_ia_payload(normalized_payload) {
+  if (!normalized_payload.usuario_id) {
+    throw new Error('El usuario no es valido');
+  }
+
+  if (!normalized_payload.prompt) {
+    throw new Error('Debes escribir un prompt');
+  }
+
+  if (normalized_payload.prompt.length > 250) {
+    throw new Error('El prompt supera el maximo de 250 caracteres');
+  }
+
+  const has_lat = normalized_payload.lat != null;
+  const has_lon = normalized_payload.lon != null;
+  if (has_lat !== has_lon) {
+    throw new Error('Para usar clima debes enviar lat y lon juntos');
   }
 }
 
@@ -46,6 +90,14 @@ export async function create_outfit_in_backend(payload) {
   validate_outfit_payload(normalized_payload);
 
   return post_json('/api/outfits/', normalized_payload);
+}
+
+// Genera un outfit con IA usando el backend.
+export async function create_outfit_from_ia_in_backend(payload) {
+  const normalized_payload = normalize_outfit_ia_payload(payload);
+  validate_outfit_ia_payload(normalized_payload);
+
+  return post_json('/api/outfits/generar-desde-ia', normalized_payload);
 }
 
 export async function delete_outfit_from_backend(outfit_id) {

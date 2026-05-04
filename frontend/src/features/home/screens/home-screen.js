@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
 import { select_auth_profile, select_auth_user_id } from '../../auth/selectors';
-import { fetch_current_weather_from_backend } from '../api/home-api';
+import { fetch_current_weather_from_backend } from '../../../shared/api/clima-api';
 import { fetch_prendas_for_user } from '../../prendas/state/prendas-slice';
 import {
   select_prendas_items,
@@ -16,17 +16,13 @@ import {
   ChevronRightIcon,
   ShirtIcon,
   SparklesIcon,
-  SunIcon,
-  CloudIcon,
-  CloudSunIcon,
-  CloudRainIcon,
-  SnowflakeIcon,
-  BoltIcon,
   ConjuntosIcon,
 } from '../../../shared/icons/app-icons';
 import { palette } from '../../../shared/theme/palette';
+import { WeatherCard } from '../../../shared/components/weather-card';
 import { home_screen_styles } from './home-screen.styles';
 
+// Calcula el criterio de orden para prendas recientes.
 function get_prenda_created_sort_value(prenda) {
   const parsed_date = Date.parse(String(prenda?.fecha_creacion ?? ''));
   if (!Number.isNaN(parsed_date)) {
@@ -37,41 +33,7 @@ function get_prenda_created_sort_value(prenda) {
   return Number.isNaN(numeric_id) ? 0 : numeric_id;
 }
 
-function capitalize_text(value) {
-  const text = String(value ?? '').trim();
-  if (!text) {
-    return '';
-  }
-
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-function WeatherIconSelector({ descripcion, color, size }) {
-  const desc = String(descripcion ?? '').toLowerCase();
-
-  // Si está lloviendo o hay tormenta
-  if (desc.includes('tormenta') || desc.includes('trueno') || desc.includes('rayo')) {
-    return <BoltIcon color={color} size={size} />;
-  }
-  if (desc.includes('lluvia') || desc.includes('llovizna') || desc.includes('aguacero') || desc.includes('chubasco')) {
-    return <CloudRainIcon color={color} size={size} />;
-  }
-  // Si hace frío extremo
-  if (desc.includes('nieve') || desc.includes('nevada')) {
-    return <SnowflakeIcon color={color} size={size} />;
-  }
-  // Si hay nubes
-  if (desc.includes('nublado') || desc.includes('nubes') || desc.includes('nuboso') || desc.includes('niebla')) {
-    if (desc.includes('poco') || desc.includes('parcialmente') || desc.includes('dispersas')) {
-      return <CloudSunIcon color={color} size={size} />;
-    }
-    return <CloudIcon color={color} size={size} />;
-  }
-
-  // Por defecto (Despejado, soleado, o si está cargando)
-  return <SunIcon color={color} size={size} />;
-}
-
+// Renderiza la pantalla principal con clima y accesos rapidos.
 export function HomeScreen() {
   const router = useRouter();
   const dispatch = use_app_dispatch();
@@ -168,19 +130,6 @@ export function HomeScreen() {
         ? 'Buenas tardes,'
         : 'Buenas noches,';
   const fecha_actual = `${dias[hoy.getDay()]} · ${hoy.getDate()} ${meses[hoy.getMonth()]}`;
-  const weather_temperature = Number(weather_data?.temperatura_c);
-  const weather_temp_text = Number.isNaN(weather_temperature) ? '--' : `${Math.round(weather_temperature)}°`;
-  const weather_location = [weather_data?.ciudad, weather_data?.pais].filter(Boolean).join(', ');
-  const weather_description = capitalize_text(weather_data?.descripcion);
-  const weather_desc_text = weather_status === 'loading'
-    ? 'Cargando clima real...'
-    : weather_data
-      ? `${weather_description || 'Sin descripcion'}${weather_location ? ` · ${weather_location}` : ''}`
-      : 'Clima no disponible';
-  const weather_hint_text = weather_status === 'loading'
-    ? 'Calculando...'
-    : (weather_data?.sugerencia_ropa ?? 'Sin recomendacion');
-
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -200,35 +149,7 @@ export function HomeScreen() {
         </Text>
       </View>
 
-      <View style={home_screen_styles.weather_card}>
-
-        <View style={home_screen_styles.weather_top_row}>
-          <View style={home_screen_styles.weather_temp_container}>
-            <WeatherIconSelector
-              descripcion={weather_data?.descripcion}
-              color={palette.walnut_soft}
-              size={31}
-            />
-            <Text selectable style={home_screen_styles.weather_temp_text}>
-              {weather_temp_text}
-            </Text>
-          </View>
-
-          <View style={home_screen_styles.weather_hint_container}>
-            <Text selectable style={home_screen_styles.weather_day_text}>
-              Hoy:
-            </Text>
-            <Text selectable style={home_screen_styles.weather_hint_text}>
-              {weather_hint_text}
-            </Text>
-          </View>
-        </View>
-
-        <Text selectable style={home_screen_styles.weather_desc_text}>
-          {weather_desc_text}
-        </Text>
-
-      </View>
+      <WeatherCard weather={weather_data} status={weather_status} />
 
       <View style={home_screen_styles.wardrobe_section}>
         <Text selectable style={home_screen_styles.section_title}>
@@ -275,7 +196,11 @@ export function HomeScreen() {
         </View>
       </View>
 
-      <View style={home_screen_styles.ia_card}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => router.push('/conjuntos/nuevo-ia')}
+        style={home_screen_styles.ia_card}
+      >
         <View style={home_screen_styles.ia_card_left}>
           <View style={home_screen_styles.ia_icon_chip}>
             <SparklesIcon color={palette.walnut} size={18} />
@@ -290,7 +215,7 @@ export function HomeScreen() {
           </View>
         </View>
         <ChevronRightIcon color={palette.white} size={16} />
-      </View>
+      </Pressable>
 
       <View style={home_screen_styles.recent_section}>
         <View style={home_screen_styles.recent_header}>

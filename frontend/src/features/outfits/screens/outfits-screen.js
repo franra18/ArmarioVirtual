@@ -177,6 +177,11 @@ export function OutfitsScreen() {
     dispatch(fetch_outfits_for_user(auth_user_id));
   };
 
+  // Abre la pantalla de generacion con IA.
+  const handle_open_ia = () => {
+    router.push('/conjuntos/nuevo-ia');
+  };
+
   if (!auth_user_id) {
     return (
       <View style={outfits_screen_styles.loading_state}>
@@ -275,7 +280,7 @@ export function OutfitsScreen() {
               </Pressable>
             </View>
 
-            <Pressable style={outfits_screen_styles.ia_card}>
+            <Pressable style={outfits_screen_styles.ia_card} onPress={handle_open_ia}>
               <View style={outfits_screen_styles.ia_card_left}>
                 <View style={outfits_screen_styles.ia_icon_chip}>
                   <SparklesIcon size={16} color={palette.walnut} />

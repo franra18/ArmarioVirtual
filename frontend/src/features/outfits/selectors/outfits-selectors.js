@@ -7,3 +7,7 @@ export const select_outfits_delete_status = (state) => state.outfits.delete_stat
 export const select_outfits_delete_error = (state) => state.outfits.delete_error;
 export const select_outfits_create_status = (state) => state.outfits.create_status;
 export const select_outfits_create_error = (state) => state.outfits.create_error;
+// Selecciona el estado de generacion con IA.
+export const select_outfits_ia_status = (state) => state.outfits.ia_status;
+// Selecciona el error de generacion con IA.
+export const select_outfits_ia_error = (state) => state.outfits.ia_error;

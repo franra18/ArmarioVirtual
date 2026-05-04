@@ -1,5 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { create_outfit_in_backend, delete_outfit_from_backend, fetch_outfits_from_backend, update_outfit_in_backend } from '../api/outfits-api';
+import {
+  create_outfit_from_ia_in_backend,
+  create_outfit_in_backend,
+  delete_outfit_from_backend,
+  fetch_outfits_from_backend,
+  update_outfit_in_backend,
+} from '../api/outfits-api';
 
 export const fetch_outfits_for_user = createAsyncThunk(
   'outfits/fetch_outfits_for_user',
@@ -44,6 +50,19 @@ export const create_outfit_manual = createAsyncThunk(
   }
 );
 
+// Genera un outfit con IA usando el backend.
+export const create_outfit_from_ia = createAsyncThunk(
+  'outfits/create_outfit_from_ia',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const created_outfit = await create_outfit_from_ia_in_backend(payload);
+      return created_outfit;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo generar el outfit');
+    }
+  }
+);
+
 export const update_outfit_manual = createAsyncThunk(
   'outfits/update_outfit_manual',
   async (payload, { rejectWithValue }) => {
@@ -66,6 +85,8 @@ const initial_state = {
   delete_error: null,
   create_status: 'idle',
   create_error: null,
+  ia_status: 'idle',
+  ia_error: null,
 };
 
 const outfits_slice = createSlice({
@@ -96,6 +117,8 @@ const outfits_slice = createSlice({
       state.delete_error = null;
       state.create_status = 'idle';
       state.create_error = null;
+      state.ia_status = 'idle';
+      state.ia_error = null;
     },
   },
   extraReducers: (builder) => {
@@ -147,6 +170,20 @@ const outfits_slice = createSlice({
       .addCase(create_outfit_manual.rejected, (state, action) => {
         state.create_status = 'failed';
         state.create_error = action.payload ?? 'No se pudo crear el outfit';
+      });
+    builder
+      .addCase(create_outfit_from_ia.pending, (state) => {
+        state.ia_status = 'loading';
+        state.ia_error = null;
+      })
+      .addCase(create_outfit_from_ia.fulfilled, (state, action) => {
+        state.ia_status = 'succeeded';
+        state.ia_error = null;
+        state.items = [action.payload, ...state.items];
+      })
+      .addCase(create_outfit_from_ia.rejected, (state, action) => {
+        state.ia_status = 'failed';
+        state.ia_error = action.payload ?? 'No se pudo generar el outfit';
       });
     builder
       .addCase(update_outfit_manual.pending, (state) => {
