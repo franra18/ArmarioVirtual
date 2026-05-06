@@ -1,5 +1,9 @@
 export const select_auth_profile = (state) => state.auth.profile;
 export const select_auth_user_id = (state) => state.auth.user_id;
+export const select_auth_firebase_uid = (state) => state.auth.firebase_uid;
+export const select_auth_firebase_email = (state) => state.auth.firebase_email;
 export const select_is_authenticated = (state) => Boolean(state.auth.user_id);
 export const select_auth_status = (state) => state.auth.status;
 export const select_auth_error = (state) => state.auth.error;
+export const select_auth_update_status = (state) => state.auth.update_status;
+export const select_auth_update_error = (state) => state.auth.update_error;

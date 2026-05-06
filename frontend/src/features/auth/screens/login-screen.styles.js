@@ -74,4 +74,13 @@ export const login_screen_styles = StyleSheet.create({
     fontFamily: typography.body_medium,
     fontSize: 16,
   },
+  toggle_button: {
+    alignSelf: 'center',
+    paddingVertical: 6,
+  },
+  toggle_text: {
+    color: palette.sky_ink,
+    fontFamily: typography.body_medium,
+    fontSize: 13,
+  },
 });

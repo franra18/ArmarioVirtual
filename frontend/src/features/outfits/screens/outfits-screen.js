@@ -51,7 +51,7 @@ function render_empty_state(has_error, outfits_error, on_retry, search_term) {
       <Text selectable style={outfits_screen_styles.empty_subtitle}>
         {search_term.trim()
           ? 'Prueba con otro texto o cambia el filtro.'
-          : 'Cuando crees outfits en tu armario aparecerán aquí.'}
+          : 'Cuando crees conjuntos en tu armario aparecerán aquí.'}
       </Text>
     </View>
   );

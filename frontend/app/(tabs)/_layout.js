@@ -43,7 +43,6 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="account"
-        listeners={{ tabPress: block_navigation }}
         options={{
           title: 'Cuenta',
           tabBarIcon: ({ color, size }) => <AccountIcon color={color} size={size} />,
