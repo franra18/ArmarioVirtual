@@ -1,3 +1,6 @@
+import tinycolor from 'tinycolor2';
+import { palette } from '../../../shared/theme/palette';
+
 export function normalize_prenda_text(value) {
   return String(value ?? '')
     .toLowerCase()
@@ -77,4 +80,127 @@ export function get_prenda_added_sort_value(prenda) {
 
   const numeric_id = Number(prenda?.id);
   return Number.isNaN(numeric_id) ? 0 : numeric_id;
+}
+
+const spanish_color_phrase_aliases = [
+  ['azul marino', 'navy'],
+  ['azul cielo', 'skyblue'],
+  ['azul claro', 'lightskyblue'],
+  ['verde oliva', 'olive'],
+  ['verde agua', 'mediumaquamarine'],
+  ['gris oscuro', 'dimgray'],
+  ['gris claro', 'lightgray'],
+  ['marron oscuro', 'saddlebrown'],
+  ['marron claro', 'peru'],
+  ['cafe oscuro', 'saddlebrown'],
+  ['cafe claro', 'tan'],
+  ['blanco roto', 'ivory'],
+  ['rojo vino', 'maroon'],
+];
+
+const spanish_color_token_aliases = {
+  blanco: 'white',
+  negro: 'black',
+  gris: 'gray',
+  plata: 'silver',
+  plateado: 'silver',
+  rojo: 'red',
+  granate: 'maroon',
+  bordo: 'maroon',
+  vino: 'maroon',
+  azul: 'blue',
+  marino: 'navy',
+  celeste: 'skyblue',
+  cielo: 'skyblue',
+  turquesa: 'turquoise',
+  verde: 'green',
+  oliva: 'olive',
+  lima: 'lime',
+  amarillo: 'yellow',
+  dorado: 'gold',
+  oro: 'gold',
+  naranja: 'orange',
+  coral: 'coral',
+  rosa: 'pink',
+  fucsia: 'fuchsia',
+  morado: 'purple',
+  violeta: 'violet',
+  lila: 'plum',
+  marron: 'saddlebrown',
+  cafe: 'saddlebrown',
+  castano: 'saddlebrown',
+  beige: 'beige',
+  crema: 'ivory',
+  crudo: 'beige',
+  hueso: 'beige',
+  camel: 'tan',
+  caqui: 'khaki',
+};
+
+function normalize_color_text(color_name) {
+  return String(color_name ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function resolve_spanish_color_alias(normalized_color_name, tokens) {
+  for (const [phrase, css_color] of spanish_color_phrase_aliases) {
+    if (normalized_color_name.includes(phrase)) {
+      return css_color;
+    }
+  }
+
+  for (const token of tokens) {
+    if (spanish_color_token_aliases[token]) {
+      return spanish_color_token_aliases[token];
+    }
+  }
+
+  return null;
+}
+
+function build_deterministic_color(color_name) {
+  const normalized = normalize_color_text(color_name);
+  if (!normalized) {
+    return palette.cream_deep;
+  }
+
+  let hash = 0;
+  for (let index = 0; index < normalized.length; index += 1) {
+    hash = ((hash << 5) - hash) + normalized.charCodeAt(index);
+    hash |= 0;
+  }
+
+  const hue = Math.abs(hash) % 360;
+  return tinycolor({ h: hue, s: 50, l: 48 }).toHexString();
+}
+
+export function get_prenda_color_hex(color_name) {
+  const normalized = normalize_color_text(color_name);
+  if (!normalized) {
+    return palette.cream_deep;
+  }
+
+  const direct_match = tinycolor(normalized);
+  if (direct_match.isValid()) {
+    return direct_match.toHexString();
+  }
+
+  const token_matches = normalized.split(/[\s/-]+/).filter(Boolean);
+
+  const spanish_alias = resolve_spanish_color_alias(normalized, token_matches);
+  if (spanish_alias) {
+    return tinycolor(spanish_alias).toHexString();
+  }
+
+  for (const token of token_matches) {
+    const token_match = tinycolor(token);
+    if (token_match.isValid()) {
+      return token_match.toHexString();
+    }
+  }
+
+  return build_deterministic_color(normalized);
 }

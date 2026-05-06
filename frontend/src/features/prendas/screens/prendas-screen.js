@@ -255,8 +255,6 @@ export function PrendasScreen() {
 
   const open_add_options = () => {
     set_is_filter_card_open(false);
-    set_is_elegance_select_open(false);
-    set_is_warmth_select_open(false);
     set_is_add_options_open(true);
   };
 

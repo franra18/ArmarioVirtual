@@ -318,6 +318,14 @@ export const prenda_create_manual_screen_styles = StyleSheet.create({
     paddingRight: 6,
     paddingVertical: 7,
   },
+  selected_color_chip_swatch: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
+  },
   selected_color_chip_text: {
     color: palette.white,
     fontFamily: typography.body_medium,

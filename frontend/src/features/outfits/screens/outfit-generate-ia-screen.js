@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Pressable,
   ScrollView,
@@ -23,8 +24,8 @@ import {
   prompt_placeholder_color,
 } from './outfit-generate-ia-screen.styles';
 
-const plan_options = ['Cena formal', 'Partido', 'Boda'];
-const style_options = ['Relajado', 'Elegante', 'Deportivo', 'Sorprendeme'];
+const plan_options = ['Cena', 'Gimnasio', 'Ir a clase'];
+const style_options = ['Casual', 'Elegante', 'Deportivo', 'Sorpréndeme'];
 
 // Normaliza una coordenada a maximo dos decimales.
 function normalize_coordinate(value) {
@@ -226,6 +227,8 @@ export function OutfitGenerateIaScreen() {
               multiline
               maxLength={250}
               returnKeyType="done"
+              blurOnSubmit
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
             <View style={outfit_generate_ia_styles.prompt_footer}>
               <Text selectable style={outfit_generate_ia_styles.prompt_count}>

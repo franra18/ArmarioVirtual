@@ -44,6 +44,7 @@ class PrendaIACRUD:
 			'  "color_nombres": ["string"]\n'
 			"}\n"
 			"tipo_prenda debe describir la prenda detectada (ej.: camisa, pantalon, vestido, chaqueta, zapatillas).\n"
+			"Si encaja con un tipo predefinido, devuelve exactamente uno de: Camiseta, Chaqueta, Pantalon, Accesorio, Calzado.\n"
 			"color_ids y color_nombres pueden coexistir.\n"
 			"Si el color ya existe en el catalogo, usa su ID en color_ids.\n"
 			"Si el color no existe, devuelvelo en color_nombres para que el sistema lo cree.\n"

@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FontAwesome6 } from '@expo/vector-icons';
-import tinycolor from 'tinycolor2';
 import { palette } from '../../../shared/theme/palette';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
 import { delete_prenda_by_id, fetch_prendas_for_user, toggle_prenda_favorite } from '../state/prendas-slice';
-import { resolve_prenda_icon_name, to_prenda_title_case } from '../utils/prenda-utils';
+import { get_prenda_color_hex, resolve_prenda_icon_name, to_prenda_title_case } from '../utils/prenda-utils';
 import {
   select_prendas_delete_status,
   select_prendas_favorite_ids,
@@ -17,128 +16,6 @@ import {
 } from '../selectors/prendas-selectors';
 import { prenda_detail_screen_styles } from './prenda-detail-screen.styles';
 
-function normalize_color_text(color_name) {
-  return String(color_name ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-}
-
-const spanish_color_phrase_aliases = [
-  ['azul marino', 'navy'],
-  ['azul cielo', 'skyblue'],
-  ['azul claro', 'lightskyblue'],
-  ['verde oliva', 'olive'],
-  ['verde agua', 'mediumaquamarine'],
-  ['gris oscuro', 'dimgray'],
-  ['gris claro', 'lightgray'],
-  ['marron oscuro', 'saddlebrown'],
-  ['marron claro', 'peru'],
-  ['cafe oscuro', 'saddlebrown'],
-  ['cafe claro', 'tan'],
-  ['blanco roto', 'ivory'],
-  ['rojo vino', 'maroon'],
-];
-
-const spanish_color_token_aliases = {
-  blanco: 'white',
-  negro: 'black',
-  gris: 'gray',
-  plata: 'silver',
-  plateado: 'silver',
-  rojo: 'red',
-  granate: 'maroon',
-  bordo: 'maroon',
-  vino: 'maroon',
-  azul: 'blue',
-  marino: 'navy',
-  celeste: 'skyblue',
-  cielo: 'skyblue',
-  turquesa: 'turquoise',
-  verde: 'green',
-  oliva: 'olive',
-  lima: 'lime',
-  amarillo: 'yellow',
-  dorado: 'gold',
-  oro: 'gold',
-  naranja: 'orange',
-  coral: 'coral',
-  rosa: 'pink',
-  fucsia: 'fuchsia',
-  morado: 'purple',
-  violeta: 'violet',
-  lila: 'plum',
-  marron: 'saddlebrown',
-  cafe: 'saddlebrown',
-  castano: 'saddlebrown',
-  beige: 'beige',
-  crema: 'ivory',
-  crudo: 'beige',
-  hueso: 'beige',
-  camel: 'tan',
-  caqui: 'khaki',
-};
-
-function resolve_spanish_color_alias(normalized_color_name, tokens) {
-  for (const [phrase, css_color] of spanish_color_phrase_aliases) {
-    if (normalized_color_name.includes(phrase)) {
-      return css_color;
-    }
-  }
-
-  for (const token of tokens) {
-    if (spanish_color_token_aliases[token]) {
-      return spanish_color_token_aliases[token];
-    }
-  }
-
-  return null;
-}
-
-function build_deterministic_color(color_name) {
-  const normalized = normalize_color_text(color_name);
-  if (!normalized) {
-    return palette.cream_deep;
-  }
-
-  let hash = 0;
-  for (let index = 0; index < normalized.length; index += 1) {
-    hash = ((hash << 5) - hash) + normalized.charCodeAt(index);
-    hash |= 0;
-  }
-
-  const hue = Math.abs(hash) % 360;
-  return tinycolor({ h: hue, s: 50, l: 48 }).toHexString();
-}
-
-function get_color_hex(color_name) {
-  const normalized = normalize_color_text(color_name);
-  if (!normalized) {
-    return palette.cream_deep;
-  }
-
-  const direct_match = tinycolor(normalized);
-  if (direct_match.isValid()) {
-    return direct_match.toHexString();
-  }
-
-  const token_matches = normalized.split(/[\s/-]+/).filter(Boolean);
-
-  const spanish_alias = resolve_spanish_color_alias(normalized, token_matches);
-  if (spanish_alias) {
-    return tinycolor(spanish_alias).toHexString();
-  }
-
-  for (const token of token_matches) {
-    const token_match = tinycolor(token);
-    if (token_match.isValid()) {
-      return token_match.toHexString();
-    }
-  }
-
-  return build_deterministic_color(normalized);
-}
 
 const elegance_level_labels = {
   1: 'Deportivo/Casa',
@@ -488,7 +365,7 @@ export function PrendaDetailScreen() {
                     <View
                       style={[
                         prenda_detail_screen_styles.color_circle,
-                        { backgroundColor: get_color_hex(color_name) }
+                        { backgroundColor: get_prenda_color_hex(color_name) }
                       ]}
                     />
                     <Text selectable style={prenda_detail_screen_styles.color_name}>

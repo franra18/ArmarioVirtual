@@ -20,6 +20,7 @@ import { select_auth_user_id } from '../../auth/selectors';
 import { create_color_in_backend, fetch_colores_from_backend } from '../api/prendas-api';
 import { select_prendas_create_error, select_prendas_create_status } from '../selectors/prendas-selectors';
 import { create_prenda_manual, fetch_prendas_for_user, update_prenda_manual } from '../state/prendas-slice';
+import { get_prenda_color_hex } from '../utils/prenda-utils';
 import { prenda_create_manual_screen_styles } from './prenda-create-manual-screen.styles';
 
 const tipo_prenda_options = [
@@ -741,6 +742,12 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
                     key={`selected-color-${color_item.normalized_name}`}
                     style={prenda_create_manual_screen_styles.selected_color_chip}
                   >
+                    <View
+                      style={[
+                        prenda_create_manual_screen_styles.selected_color_chip_swatch,
+                        { backgroundColor: get_prenda_color_hex(color_item.name) },
+                      ]}
+                    />
                     <Text selectable style={prenda_create_manual_screen_styles.selected_color_chip_text}>
                       {color_item.name}
                     </Text>
