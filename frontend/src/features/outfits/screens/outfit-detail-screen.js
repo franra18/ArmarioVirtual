@@ -11,9 +11,11 @@ import {
     SparklesIcon,
 } from '../../../shared/icons/app-icons';
 import { palette } from '../../../shared/theme/palette';
+import { format_date_short } from '../../../shared/utils/date-utils';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
+import { build_prenda_meta } from '../../../shared/utils/prenda-meta';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { fetch_prendas_for_user } from '../../prendas/state/prendas-slice';
 import {
     select_prendas_items,
@@ -29,47 +31,6 @@ import {
     select_outfits_status,
 } from '../selectors/outfits-selectors';
 import { outfit_detail_screen_styles } from './outfit-detail-screen.styles';
-
-const elegance_level_labels = {
-    1: 'Deportivo/Casa',
-    2: 'Informal/Casual',
-    3: 'Casual Elegante',
-    4: 'Semi-formal',
-    5: 'Formal/Gala',
-};
-
-const warmth_level_labels = {
-    1: 'Muy Ligero',
-    2: 'Ligero',
-    3: 'Intermedio',
-    4: 'Abrigado',
-    5: 'Muy abrigado',
-};
-
-function format_date(date_string) {
-    const parsed_date = new Date(String(date_string ?? ''));
-    if (Number.isNaN(parsed_date.getTime())) {
-        return 'Sin dato';
-    }
-
-    const months = [
-        'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-        'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
-    ];
-    const day = parsed_date.getDate();
-    const month = months[parsed_date.getMonth()];
-    const year = parsed_date.getFullYear();
-
-    return `${day} ${month} ${year}`;
-}
-
-function build_prenda_meta(prenda) {
-    const color_names = Array.isArray(prenda?.color_nombres) ? prenda.color_nombres : [];
-    const color_label = color_names.length ? color_names[0] : 'Sin color';
-    const warmth_label = warmth_level_labels[Number(prenda?.nivel_abrigo)] ?? 'Sin abrigo';
-    const elegance_label = elegance_level_labels[Number(prenda?.nivel_elegancia)] ?? 'Sin elegancia';
-    return `${color_label} · ${warmth_label} · ${elegance_label}`;
-}
 
 export function OutfitDetailScreen() {
     const router = useRouter();
@@ -265,7 +226,7 @@ export function OutfitDetailScreen() {
                 <View style={outfit_detail_screen_styles.meta_row}>
                     <CalendarIcon size={13} color={palette.text_muted} />
                     <Text selectable style={outfit_detail_screen_styles.meta_text}>
-                        Creado el {format_date(outfit?.fecha_creacion)}
+                        Creado el {format_date_short(outfit?.fecha_creacion)}
                     </Text>
                 </View>
 

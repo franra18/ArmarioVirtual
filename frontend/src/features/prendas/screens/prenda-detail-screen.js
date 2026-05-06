@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
+import { elegance_level_labels, warmth_level_labels } from '../../../shared/constants/prenda-constants';
+import { format_date_long, relative_time_since } from '../../../shared/utils/date-utils';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
+import {
+  AppIcon,
+  BackIcon,
+  CalendarDaysIcon,
+  CloseIcon,
+  HeartIcon,
+  TrashIcon,
+} from '../../../shared/icons/app-icons';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { delete_prenda_by_id, fetch_prendas_for_user, toggle_prenda_favorite } from '../state/prendas-slice';
 import { get_prenda_color_hex, resolve_prenda_icon_name, to_prenda_title_case } from '../utils/prenda-utils';
 import {
@@ -16,73 +25,6 @@ import {
 } from '../selectors/prendas-selectors';
 import { prenda_detail_screen_styles } from './prenda-detail-screen.styles';
 
-
-const elegance_level_labels = {
-  1: 'Deportivo/Casa',
-  2: 'Informal/Casual',
-  3: 'Casual Elegante',
-  4: 'Semi-formal',
-  5: 'Formal/Gala',
-};
-
-const warmth_level_labels = {
-  1: 'Muy Ligero',
-  2: 'Ligero',
-  3: 'Intermedio',
-  4: 'Abrigado',
-  5: 'Muy abrigado',
-};
-
-function format_date(date_string) {
-  const parsed_date = new Date(String(date_string ?? ''));
-  if (Number.isNaN(parsed_date.getTime())) {
-    return 'Sin dato';
-  }
-
-  const months = [
-    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-  ];
-  const day = parsed_date.getDate();
-  const month = months[parsed_date.getMonth()];
-  const year = parsed_date.getFullYear();
-
-  return `${day} de ${month}, ${year}`;
-}
-
-function relative_time_since(date_string) {
-  const parsed = new Date(String(date_string ?? ''));
-  if (Number.isNaN(parsed.getTime())) {
-    return '';
-  }
-
-  const now = new Date();
-  const diffMs = now - parsed;
-  const seconds = Math.floor(diffMs / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (days < 1) {
-    if (hours < 1) {
-      if (minutes < 1) return 'Hace unos segundos';
-      return `Hace ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
-    }
-    return `Hace ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
-  }
-
-  if (days < 30) {
-    return `Hace ${days} ${days === 1 ? 'día' : 'días'}`;
-  }
-
-  const months = Math.floor(days / 30);
-  if (months < 12) {
-    return `Hace ${months} ${months === 1 ? 'mes' : 'meses'}`;
-  }
-
-  const years = Math.floor(months / 12);
-  return `Hace ${years} ${years === 1 ? 'año' : 'años'}`;
-}
 
 function normalize_level(level_value) {
   const parsed_level = Number(level_value);
@@ -227,7 +169,7 @@ export function PrendaDetailScreen() {
         <View style={prenda_detail_screen_styles.header_image_container}>
           <View style={prenda_detail_screen_styles.header_controls}>
             <Pressable onPress={() => router.back()} style={prenda_detail_screen_styles.control_button}>
-              <FontAwesome6 name="chevron-left" size={16} color={palette.walnut} />
+              <BackIcon size={16} color={palette.walnut} />
             </Pressable>
 
             <View style={prenda_detail_screen_styles.header_right_actions}>
@@ -235,8 +177,7 @@ export function PrendaDetailScreen() {
                 onPress={handle_toggle_favorite}
                 style={prenda_detail_screen_styles.control_button}
               >
-                <FontAwesome6
-                  name="heart"
+                <HeartIcon
                   size={16}
                   color={is_favorite ? palette.walnut : palette.text_muted}
                   solid={is_favorite}
@@ -247,7 +188,7 @@ export function PrendaDetailScreen() {
                 style={prenda_detail_screen_styles.control_button}
                 disabled={is_deleting}
               >
-                <FontAwesome6 name="trash" size={14} color={palette.walnut} />
+                <TrashIcon size={14} color={palette.walnut} />
               </Pressable>
             </View>
           </View>
@@ -265,7 +206,7 @@ export function PrendaDetailScreen() {
                 />
               </Pressable>
             ) : (
-              <FontAwesome6
+              <AppIcon
                 name={resolve_prenda_icon_name(prenda?.tipo_prenda)}
                 size={80}
                 color={palette.walnut}
@@ -386,12 +327,12 @@ export function PrendaDetailScreen() {
             <View style={prenda_detail_screen_styles.added_card}>
               <View style={prenda_detail_screen_styles.added_left}>
                 <View style={prenda_detail_screen_styles.added_icon_wrap}>
-                  <FontAwesome6 name="calendar-days" size={18} color={palette.walnut} />
+                  <CalendarDaysIcon size={18} color={palette.walnut} />
                 </View>
 
                 <View>
                   <Text selectable style={prenda_detail_screen_styles.info_value}>
-                    {format_date(prenda?.fecha_creacion)}
+                    {format_date_long(prenda?.fecha_creacion)}
                   </Text>
                 </View>
               </View>
@@ -438,7 +379,7 @@ export function PrendaDetailScreen() {
             style={prenda_detail_screen_styles.fullscreen_close_button}
             hitSlop={10}
           >
-            <FontAwesome6 name="xmark" size={18} color={palette.white} />
+            <CloseIcon size={18} color={palette.white} />
           </Pressable>
         </View>
       </Modal>

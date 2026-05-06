@@ -4,10 +4,10 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { palette } from '../../../shared/theme/palette';
 import { upload_local_image_to_cloudinary } from '../../../shared/utils/cloudinary';
+import { CameraIcon, ImageIcon, InfoIcon } from '../../../shared/icons/app-icons';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { create_prenda_from_image_ia, fetch_prendas_for_user } from '../state/prendas-slice';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { prenda_create_manual_screen_styles as prenda_create_ia_screen_styles } from './prenda-create-manual-screen.styles';
 
 export function PrendaCreateIaScreen() {
@@ -169,7 +169,7 @@ export function PrendaCreateIaScreen() {
           ) : (
             <View style={prenda_create_ia_screen_styles.photo_placeholder}>
               <View style={prenda_create_ia_screen_styles.photo_icon_wrap}>
-                <FontAwesome6 name="image" size={18} color={palette.walnut} />
+                <ImageIcon size={18} color={palette.walnut} />
               </View>
               <Text selectable style={prenda_create_ia_screen_styles.photo_placeholder_text}>
                 Añadir foto de la prenda
@@ -179,13 +179,13 @@ export function PrendaCreateIaScreen() {
 
           <View style={prenda_create_ia_screen_styles.photo_actions_row}>
             <Pressable onPress={pick_image_from_camera} style={prenda_create_ia_screen_styles.photo_action_button}>
-              <FontAwesome6 name="camera" size={13} color={palette.walnut} />
+              <CameraIcon size={13} color={palette.walnut} />
               <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_text}>
                 Cámara
               </Text>
             </Pressable>
             <Pressable onPress={pick_image_from_gallery} style={prenda_create_ia_screen_styles.photo_action_button}>
-              <FontAwesome6 name="image" size={13} color={palette.walnut} />
+              <ImageIcon size={13} color={palette.walnut} />
               <Text selectable style={prenda_create_ia_screen_styles.photo_action_button_text}>
                 Galería
               </Text>
@@ -203,7 +203,7 @@ export function PrendaCreateIaScreen() {
 
         <View style={prenda_create_ia_screen_styles.card}>
           <View style={prenda_create_ia_screen_styles.helper_box}>
-            <FontAwesome6 name="circle-info" size={14} color={palette.walnut} style={prenda_create_ia_screen_styles.helper_icon} />
+            <InfoIcon size={14} color={palette.walnut} style={prenda_create_ia_screen_styles.helper_icon} />
             <Text selectable style={prenda_create_ia_screen_styles.helper_text}>
               La IA asignará automáticamente los atributos de la prenda y la registrará en tu armario. Luego podrás editar cualquier detalle.
             </Text>

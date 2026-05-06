@@ -12,11 +12,17 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
 import { resolve_prenda_image_url, upload_local_image_to_cloudinary } from '../../../shared/utils/cloudinary';
+import {
+  AppIcon,
+  CheckIcon,
+  CloseIcon,
+  ImageIcon,
+  PlusIcon,
+} from '../../../shared/icons/app-icons';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { create_color_in_backend, fetch_colores_from_backend } from '../api/prendas-api';
 import { select_prendas_create_error, select_prendas_create_status } from '../selectors/prendas-selectors';
 import { create_prenda_manual, fetch_prendas_for_user, update_prenda_manual } from '../state/prendas-slice';
@@ -500,7 +506,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
           ) : (
             <View style={prenda_create_manual_screen_styles.photo_placeholder}>
               <View style={prenda_create_manual_screen_styles.photo_icon_wrap}>
-                <FontAwesome6 name="image" size={18} color={palette.walnut} />
+                <ImageIcon size={18} color={palette.walnut} />
               </View>
               <Text selectable style={prenda_create_manual_screen_styles.photo_placeholder_text}>
                 Añadir foto de la prenda
@@ -521,7 +527,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
               onPress={pick_image_from_gallery}
               style={prenda_create_manual_screen_styles.photo_action_button}
             >
-              <FontAwesome6 name="image" size={13} color={palette.walnut} />
+              <ImageIcon size={13} color={palette.walnut} />
               <Text selectable style={prenda_create_manual_screen_styles.photo_action_button_text}>
                 Galería
               </Text>
@@ -571,7 +577,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
                     is_active ? prenda_create_manual_screen_styles.type_card_active : null,
                   ]}
                 >
-                  <FontAwesome6
+                  <AppIcon
                     name={option.icon}
                     size={18}
                     color={is_active ? palette.white : palette.walnut}
@@ -693,7 +699,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
                       ]}
                     >
                       {is_selected ? (
-                        <FontAwesome6 name="check" size={12} color={palette.white} />
+                        <CheckIcon size={12} color={palette.white} />
                       ) : null}
                     </View>
                     <Text selectable style={prenda_create_manual_screen_styles.color_label}>
@@ -708,7 +714,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
               onPress={() => set_is_custom_color_open((is_open) => !is_open)}
               style={prenda_create_manual_screen_styles.custom_color_button}
             >
-              <FontAwesome6 name="plus" size={12} color={palette.sky_ink} />
+              <PlusIcon size={12} color={palette.sky_ink} />
               <Text selectable style={prenda_create_manual_screen_styles.custom_color_button_text}>
                 Color personalizado
               </Text>
@@ -755,7 +761,7 @@ export function PrendaCreateManualScreen({ prenda_to_edit = null }) {
                       onPress={() => remove_selected_color(color_item.normalized_name)}
                       style={prenda_create_manual_screen_styles.selected_color_chip_remove_button}
                     >
-                      <FontAwesome6 name="xmark" size={10} color={palette.white} />
+                      <CloseIcon size={10} color={palette.white} />
                     </Pressable>
                   </View>
                 ))}

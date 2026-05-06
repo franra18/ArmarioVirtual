@@ -11,11 +11,11 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
+import { build_prenda_meta } from '../../../shared/utils/prenda-meta';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import {
   select_prendas_error,
   select_prendas_items,
@@ -33,7 +33,13 @@ import {
   select_outfits_create_status,
 } from '../selectors/outfits-selectors';
 import { create_outfit_manual, update_outfit_manual } from '../state/outfits-slice';
-import { ChevronRightIcon, TrashIcon } from '../../../shared/icons/app-icons';
+import {
+  AppIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  PlusIcon,
+  TrashIcon,
+} from '../../../shared/icons/app-icons';
 import { outfit_create_screen_styles } from './outfit-create-screen.styles';
 
 const occasion_options = [
@@ -45,30 +51,6 @@ const occasion_options = [
   'Viaje',
   'Playa',
 ];
-
-const elegance_level_labels = {
-  1: 'Deportivo/Casa',
-  2: 'Informal/Casual',
-  3: 'Casual Elegante',
-  4: 'Semi-formal',
-  5: 'Formal/Gala',
-};
-
-const warmth_level_labels = {
-  1: 'Muy Ligero',
-  2: 'Ligero',
-  3: 'Intermedio',
-  4: 'Abrigado',
-  5: 'Muy abrigado',
-};
-
-function build_prenda_meta(prenda) {
-  const color_names = Array.isArray(prenda?.color_nombres) ? prenda.color_nombres : [];
-  const color_label = color_names.length ? color_names[0] : 'Sin color';
-  const warmth_label = warmth_level_labels[Number(prenda?.nivel_abrigo)] ?? 'Sin abrigo';
-  const elegance_label = elegance_level_labels[Number(prenda?.nivel_elegancia)] ?? 'Sin elegancia';
-  return `${color_label} · ${warmth_label} · ${elegance_label}`;
-}
 
 export function OutfitCreateScreen({ outfit_to_edit = null }) {
   const is_editing = Boolean(outfit_to_edit?.id);
@@ -423,7 +405,7 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
                           resizeMode="cover"
                         />
                       ) : (
-                        <FontAwesome6 name={icon_name} size={22} color={palette.walnut} />
+                        <AppIcon name={icon_name} size={22} color={palette.walnut} />
                       )}
                     </View>
                     <View style={outfit_create_screen_styles.selected_info}>
@@ -456,7 +438,7 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
 
             <Pressable onPress={open_selector} style={outfit_create_screen_styles.add_card}>
               <View style={outfit_create_screen_styles.add_icon_wrap}>
-                <FontAwesome6 name="plus" size={18} color={palette.walnut} />
+                <PlusIcon size={18} color={palette.walnut} />
               </View>
               <Text selectable style={outfit_create_screen_styles.add_text}>
                 Añadir prenda
@@ -588,7 +570,7 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
                             resizeMode="cover"
                           />
                         ) : (
-                          <FontAwesome6 name={icon_name} size={18} color={palette.walnut} />
+                          <AppIcon name={icon_name} size={18} color={palette.walnut} />
                         )}
                       </View>
                       <View style={outfit_create_screen_styles.selector_item_info}>
@@ -602,7 +584,7 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
                     </View>
                     {is_selected ? (
                       <View style={outfit_create_screen_styles.selector_check}>
-                        <FontAwesome6 name="check" size={12} color={palette.white} />
+                        <CheckIcon size={12} color={palette.white} />
                       </View>
                     ) : (
                       <View style={outfit_create_screen_styles.selector_check_placeholder} />

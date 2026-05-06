@@ -44,10 +44,10 @@ export function LoginScreen() {
       <View style={login_screen_styles.container}>
         <View style={login_screen_styles.heading_group}>
           <Text selectable style={login_screen_styles.title}>
-            Armario
+            Armario Virtual
           </Text>
           <Text selectable style={login_screen_styles.subtitle}>
-            Inicia sesion con tu correo y contrasena.
+            Inicia sesión con tu correo y contraseña.
           </Text>
         </View>
 
@@ -70,12 +70,12 @@ export function LoginScreen() {
 
         <View style={login_screen_styles.field_group}>
           <Text selectable style={login_screen_styles.label}>
-            Contrasena
+            Contraseña
           </Text>
           <TextInput
             value={password}
             onChangeText={set_password}
-            placeholder="Minimo 6 caracteres"
+            placeholder="Mínimo 6 caracteres"
             placeholderTextColor={login_input_placeholder_color}
             secureTextEntry
             returnKeyType="done"
@@ -113,8 +113,8 @@ export function LoginScreen() {
         >
           <Text selectable style={login_screen_styles.toggle_text}>
             {is_registering
-              ? 'Ya tienes cuenta? Inicia sesion'
-              : 'No tienes cuenta? Crear cuenta'}
+              ? '¿Ya tienes cuenta? Inicia sesión'
+              : '¿No tienes cuenta? Crear cuenta'}
           </Text>
         </Pressable>
       </View>

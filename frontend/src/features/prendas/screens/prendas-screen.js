@@ -2,10 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useScrollToTop } from '@react-navigation/native';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { PrendaCard } from '../components/prenda-card';
 import { fetch_prendas_for_user, toggle_prenda_favorite } from '../state/prendas-slice';
 import {
@@ -21,7 +20,7 @@ import {
   select_prendas_status,
 } from '../selectors/prendas-selectors';
 import { prendas_screen_styles, search_input_placeholder_color } from './prendas-screen.styles';
-import { HeartIcon, SparklesIcon } from '../../../shared/icons/app-icons';
+import { FilterIcon, HeartIcon, SearchIcon, SparklesIcon } from '../../../shared/icons/app-icons';
 
 const elegance_level_options = [
   { value: null, label: 'Todos' },
@@ -330,7 +329,7 @@ export function PrendasScreen() {
 
             <View style={prendas_screen_styles.controls_row}>
               <View style={prendas_screen_styles.search_box}>
-                <FontAwesome6 name="magnifying-glass" size={16} color={palette.text_muted} />
+                <SearchIcon size={16} color={palette.text_muted} />
                 <TextInput
                   value={search_term}
                   onChangeText={set_search_term}
@@ -364,8 +363,7 @@ export function PrendasScreen() {
                     : null,
                 ]}
               >
-                <FontAwesome6
-                  name="filter"
+                <FilterIcon
                   size={14}
                   color={(is_filter_card_open || has_advanced_filters) ? palette.white : palette.walnut}
                 />

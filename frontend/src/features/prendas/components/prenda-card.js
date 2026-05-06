@@ -1,7 +1,7 @@
 import { Image, Pressable, Text, View } from 'react-native';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { palette } from '../../../shared/theme/palette';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
+import { AppIcon, HeartIcon } from '../../../shared/icons/app-icons';
 import { resolve_prenda_icon_name, to_prenda_title_case } from '../utils/prenda-utils';
 import { prenda_card_styles } from './prenda-card.styles';
 
@@ -40,8 +40,7 @@ export function PrendaCard({ prenda, index, is_favorite, on_toggle_favorite, on_
           style={prenda_card_styles.favorite_button}
           hitSlop={10}
         >
-          <FontAwesome6
-            name="heart"
+          <HeartIcon
             size={13}
             color={is_favorite ? palette.walnut : palette.text_muted}
             solid={is_favorite}
@@ -55,7 +54,7 @@ export function PrendaCard({ prenda, index, is_favorite, on_toggle_favorite, on_
             resizeMode="cover"
           />
         ) : (
-          <FontAwesome6 name={icon_name} size={47} color={palette.walnut} />
+          <AppIcon name={icon_name} size={47} color={palette.walnut} />
         )}
       </View>
 

@@ -46,6 +46,7 @@ def ensure_prendas_fecha_creacion_column() -> None:
             connection.execute(add_column_sql)
             logger.info("Columna fecha_creacion agregada en la tabla prendas.")
 
+# Definir el ciclo de vida de la aplicacion para iniciar y cerrar recursos.
 # 2. Definir el ciclo de vida (Lifespan)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -78,6 +79,7 @@ app.include_router(outfits_router.router, prefix="/api/outfits", tags=["Outfits"
 app.include_router(colores_router.router, prefix="/api/colores", tags=["Colores"])
 app.include_router(clima_router.router, prefix="/api/clima", tags=["Clima"])
 
+# Responder el estado basico del servicio.
 @app.get("/")
 def read_root():
     return {

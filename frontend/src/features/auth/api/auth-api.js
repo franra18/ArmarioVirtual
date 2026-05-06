@@ -4,8 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { get_json, post_json, put_json } from '../../shared/api/http-client';
-import { firebase_auth } from '../../shared/firebase/firebase-client';
+import { get_json, post_json, put_json } from '../../../shared/api/http-client';
+import { firebase_auth } from '../../../shared/firebase/firebase-client';
 
 function normalize_email(value) {
   return String(value ?? '').trim().toLowerCase();
