@@ -39,7 +39,7 @@ class OutfitCRUD:
 	def _validar_prendas_obligatorias(db: Session, outfit_id: int) -> None:
 		tiene_prendas = db.query(OutfitPrenda).filter(OutfitPrenda.outfit_id == outfit_id).first()
 		if not tiene_prendas:
-			raise ValueError("El outfit debe tener al menos una prenda")
+			raise ValueError("El conjunto debe tener al menos una prenda")
 
 	# Obtener todos los outfits registrados.
 	@staticmethod
@@ -66,7 +66,7 @@ class OutfitCRUD:
 	def create(db: Session, data: OutfitCreate) -> dict:
 		prenda_ids = OutfitCRUD._normalizar_prenda_ids(data.prenda_ids)
 		if not prenda_ids:
-			raise ValueError("El outfit debe tener al menos una prenda")
+			raise ValueError("El conjunto debe tener al menos una prenda")
 
 		OutfitCRUD._validar_prendas_existentes(db, prenda_ids)
 
@@ -100,7 +100,7 @@ class OutfitCRUD:
 		if data.prenda_ids is not None:
 			prenda_ids = OutfitCRUD._normalizar_prenda_ids(data.prenda_ids)
 			if not prenda_ids:
-				raise ValueError("El outfit debe tener al menos una prenda")
+				raise ValueError("El conjunto debe tener al menos una prenda")
 
 			OutfitCRUD._validar_prendas_existentes(db, prenda_ids)
 			db.query(OutfitPrenda).filter(OutfitPrenda.outfit_id == outfit_id).delete(synchronize_session=False)

@@ -154,9 +154,9 @@ export function OutfitDetailScreen() {
 
         try {
             await dispatch(delete_outfit_by_id(outfit.id)).unwrap();
-            router.replace('/(tabs)/conjuntos');
+            router.replace('/(tabs)/outfits');
         } catch (error) {
-            Alert.alert('No se pudo eliminar', String(error ?? 'No se pudo eliminar el outfit.'));
+            Alert.alert('No se pudo eliminar', String(error ?? 'No se pudo eliminar el conjunto.'));
         }
     };
 
@@ -165,7 +165,7 @@ export function OutfitDetailScreen() {
             return;
         }
 
-        Alert.alert('Eliminar outfit', 'Esta acción no se puede deshacer. ¿Deseas continuar?', [
+        Alert.alert('Eliminar conjunto', 'Esta acción no se puede deshacer. ¿Deseas continuar?', [
             { text: 'Cancelar', style: 'cancel' },
             { text: 'Eliminar', style: 'destructive', onPress: () => { void execute_delete_outfit(); } },
         ]);
@@ -279,7 +279,7 @@ export function OutfitDetailScreen() {
             </ScrollView>
 
             <Pressable
-                onPress={() => router.push(`/conjuntos/${outfit?.id}/editar`)}
+                onPress={() => router.push(`/outfits/${outfit?.id}/editar`)}
                 style={outfit_detail_screen_styles.edit_button}
             >
                 <Text selectable style={outfit_detail_screen_styles.edit_button_text}>

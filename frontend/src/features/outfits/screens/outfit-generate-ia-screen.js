@@ -16,7 +16,7 @@ import { palette } from '../../../shared/theme/palette';
 import { WeatherCard } from '../../../shared/components/weather-card';
 import { fetch_current_weather_from_backend } from '../../../shared/api/clima-api';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { create_outfit_from_ia } from '../state/outfits-slice';
 import { select_outfits_ia_error, select_outfits_ia_status } from '../selectors/outfits-selectors';
 import {
@@ -142,7 +142,7 @@ export function OutfitGenerateIaScreen() {
     set_local_error('');
 
     if (!auth_user_id) {
-      set_local_error('Necesitas iniciar sesion para generar un outfit');
+      set_local_error('Necesitas iniciar sesion para generar un conjunto');
       return;
     }
 
@@ -170,9 +170,9 @@ export function OutfitGenerateIaScreen() {
     set_is_processing_submission(true);
     try {
       const created_outfit = await dispatch(create_outfit_from_ia(payload)).unwrap();
-      router.replace(`/conjuntos/${created_outfit.id}`);
+      router.replace(`/outfits/${created_outfit.id}`);
     } catch (error) {
-      set_local_error(error?.message ?? 'No se pudo generar el outfit');
+      set_local_error(error?.message ?? 'No se pudo generar el conjunto');
     } finally {
       set_is_processing_submission(false);
     }
@@ -203,7 +203,7 @@ export function OutfitGenerateIaScreen() {
           </Pressable>
 
           <Text selectable style={outfit_generate_ia_styles.header_title}>
-            Generacion outfit (IA)
+            Nuevo conjunto (IA)
           </Text>
 
           <View style={outfit_generate_ia_styles.header_action} />

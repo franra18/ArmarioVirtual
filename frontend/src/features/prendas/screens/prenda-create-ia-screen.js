@@ -145,7 +145,7 @@ export function PrendaCreateIaScreen() {
             </Text>
           </Pressable>
           <Text selectable style={prenda_create_ia_screen_styles.header_title}>
-            Añadir con IA
+            Nueva Prenda (IA)
           </Text>
           <View style={prenda_create_ia_screen_styles.header_action} />
         </View>

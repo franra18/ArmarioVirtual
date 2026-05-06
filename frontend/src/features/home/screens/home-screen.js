@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { resolve_prenda_image_url } from '../../../shared/utils/cloudinary';
-import { select_auth_profile, select_auth_user_id } from '../../auth/selectors';
+import { select_auth_profile, select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { fetch_current_weather_from_backend } from '../../../shared/api/clima-api';
 import { fetch_prendas_for_user } from '../../prendas/state/prendas-slice';
 import {
@@ -16,7 +16,7 @@ import {
   ChevronRightIcon,
   ShirtIcon,
   SparklesIcon,
-  ConjuntosIcon,
+  OutfitsIcon,
 } from '../../../shared/icons/app-icons';
 import { palette } from '../../../shared/theme/palette';
 import { WeatherCard } from '../../../shared/components/weather-card';
@@ -177,7 +177,7 @@ export function HomeScreen() {
 
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/(tabs)/conjuntos')}
+            onPress={() => router.push('/(tabs)/outfits')}
             style={({ pressed }) => [
               home_screen_styles.stats_card,
               pressed ? home_screen_styles.stats_card_pressed : null,
@@ -185,9 +185,9 @@ export function HomeScreen() {
           >
             <View style={home_screen_styles.stats_card_header}>
               <Text selectable style={home_screen_styles.stats_card_title}>
-                Outfits
+                Conjuntos
               </Text>
-              <ConjuntosIcon color={palette.walnut_soft} size={20} />
+              <OutfitsIcon color={palette.walnut_soft} size={20} />
             </View>
             <Text selectable style={home_screen_styles.stats_card_value}>
               {outfits_total}
@@ -198,7 +198,7 @@ export function HomeScreen() {
 
       <Pressable
         accessibilityRole="button"
-        onPress={() => router.push('/conjuntos/nuevo-ia')}
+        onPress={() => router.push('/outfits/nuevo-outfit-ia')}
         style={home_screen_styles.ia_card}
       >
         <View style={home_screen_styles.ia_card_left}>
@@ -207,7 +207,7 @@ export function HomeScreen() {
           </View>
           <View style={home_screen_styles.ia_copy}>
             <Text selectable style={home_screen_styles.ia_title}>
-              Outfit con IA
+              Conjunto con IA
             </Text>
             <Text selectable style={home_screen_styles.ia_subtitle}>
               Dime a dónde vas y compongo tu look.

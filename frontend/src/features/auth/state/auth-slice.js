@@ -6,7 +6,7 @@ import {
   sign_out_from_firebase,
   sign_up_with_email_password,
   update_user_name_in_backend,
-} from './auth-api';
+} from '../api/auth-api';
 
 export const sign_in_with_email = createAsyncThunk(
   'auth/sign_in_with_email',

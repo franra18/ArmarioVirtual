@@ -65,10 +65,10 @@ def get_prendas_by_usuario(usuario_id: int, db: Session = Depends(get_db)):
 @router.get(
 	"/{usuario_id}/outfits",
 	response_model=list[OutfitResponse],
-	summary="Obtener outfits de un usuario",
-	description="Devuelve todos los outfits asociados a un usuario especifico usando su identificador.",
+		summary="Obtener conjuntos de un usuario",
+		description="Devuelve todos los conjuntos asociados a un usuario especifico usando su identificador.",
 	responses={
-		200: {"description": "Outfits del usuario obtenidos correctamente"},
+			200: {"description": "Conjuntos del usuario obtenidos correctamente"},
 		404: {"description": "Usuario no encontrado"},
 	},
 )

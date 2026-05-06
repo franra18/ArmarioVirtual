@@ -225,10 +225,10 @@ export function OutfitCreateScreen({ outfit_to_edit = null }) {
           outfit_id: outfit_to_edit.id,
           ...payload
         })).unwrap();
-        router.replace(`/conjuntos/${outfit_to_edit.id}`);
+        router.replace(`/outfits/${outfit_to_edit.id}`);
       } else {
         const created_outfit = await dispatch(create_outfit_manual(payload)).unwrap();
-        router.replace(`/conjuntos/${created_outfit.id}`);
+        router.replace(`/outfits/${created_outfit.id}`);
       }
     } catch (error) {
       set_local_error(error?.message ?? (is_editing ? 'No se pudo actualizar el conjunto' : 'No se pudo crear el conjunto'));

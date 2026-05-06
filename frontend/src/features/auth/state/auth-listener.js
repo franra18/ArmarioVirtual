@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { listen_to_auth_changes } from './auth-api';
+import { listen_to_auth_changes } from '../api/auth-api';
 import { clear_user_session, load_firebase_user_profile } from './auth-slice';
-import { select_auth_firebase_uid, select_auth_status } from './selectors';
+import { select_auth_firebase_uid, select_auth_status } from '../selectors/auth-selectors';
 
 export function AuthListener() {
   const dispatch = use_app_dispatch();

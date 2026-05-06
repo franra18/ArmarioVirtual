@@ -13,8 +13,8 @@ export const outfits_screen_styles = StyleSheet.create({
     paddingBottom: 24,
   },
   header_stack: {
-    gap: 12,
-    paddingTop: 10,
+    gap: 20,
+    paddingTop: 15,
     paddingBottom: 14,
   },
   screen_title: {

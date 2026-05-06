@@ -12,7 +12,7 @@ export function ItemsIcon({ color, size = 20 }) {
   return <FontAwesome6 name="shirt" size={size} color={color} />;
 }
 
-export function ConjuntosIcon({ color, size = 20 }) {
+export function OutfitsIcon({ color, size = 20 }) {
   return <FontAwesome6 name="layer-group" size={size} color={color} />;
 }
 

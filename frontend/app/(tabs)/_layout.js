@@ -1,7 +1,7 @@
 import { Redirect, Tabs } from 'expo-router';
-import { AccountIcon, ConjuntosIcon, HomeIcon, ItemsIcon } from '../../src/shared/icons/app-icons';
+import { AccountIcon, HomeIcon, ItemsIcon, OutfitsIcon } from '../../src/shared/icons/app-icons';
 import { tabs_screen_options } from '../../src/shared/theme/navigation-styles';
-import { select_is_authenticated } from '../../src/features/auth/selectors';
+import { select_is_authenticated } from '../../src/features/auth/selectors/auth-selectors';
 import { use_app_selector } from '../../src/store/hooks';
 
 function block_navigation(event) {
@@ -35,10 +35,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="conjuntos"
+        name="outfits"
         options={{
           title: 'Conjuntos',
-          tabBarIcon: ({ color, size }) => <ConjuntosIcon color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <OutfitsIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen

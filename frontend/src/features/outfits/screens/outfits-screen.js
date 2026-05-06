@@ -5,7 +5,7 @@ import { useScrollToTop } from '@react-navigation/native';
 import { palette } from '../../../shared/theme/palette';
 import { FilterIcon, HeartIcon, SearchIcon, SparklesIcon } from '../../../shared/icons/app-icons';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
-import { select_auth_user_id } from '../../auth/selectors';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 import { fetch_prendas_for_user } from '../../prendas/state/prendas-slice';
 import {
   select_prendas_items,
@@ -191,14 +191,14 @@ export function OutfitsScreen() {
 
   // Abre la pantalla de generacion con IA.
   const handle_open_ia = () => {
-    router.push('/conjuntos/nuevo-ia');
+    router.push('/outfits/nuevo-outfit-ia');
   };
 
   if (!auth_user_id) {
     return (
       <View style={outfits_screen_styles.loading_state}>
         <Text selectable style={outfits_screen_styles.loading_text}>
-          Inicia sesion para ver tus outfits.
+          Inicia sesion para ver tus conjuntos.
         </Text>
       </View>
     );
@@ -243,7 +243,7 @@ export function OutfitsScreen() {
                 on_toggle_favorite={handle_toggle_favorite}
                 on_open_detail={(selected_outfit) => {
                   if (selected_outfit?.id) {
-                    router.push(`/conjuntos/${selected_outfit.id}`);
+                    router.push(`/outfits/${selected_outfit.id}`);
                   }
                 }}
               />
@@ -299,7 +299,7 @@ export function OutfitsScreen() {
               </Pressable>
 
               <Pressable
-                onPress={() => router.push('/conjuntos/nuevo')}
+                onPress={() => router.push('/outfits/nuevo-outfit-manual')}
                 style={outfits_screen_styles.add_button}
               >
                 <Text selectable style={outfits_screen_styles.add_button_text}>

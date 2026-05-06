@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { auth_reducer } from '../features/auth/auth-slice';
+import { auth_reducer } from '../features/auth/state/auth-slice';
 import { prendas_reducer } from '../features/prendas/state/prendas-slice';
 import { outfits_reducer } from '../features/outfits/state/outfits-slice';
 

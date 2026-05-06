@@ -18,7 +18,7 @@ export const fetch_outfits_for_user = createAsyncThunk(
         outfits,
       };
     } catch (error) {
-      return rejectWithValue(error?.message ?? 'No se pudieron cargar los outfits');
+      return rejectWithValue(error?.message ?? 'No se pudieron cargar los conjuntos');
     }
   }
 );
@@ -33,7 +33,7 @@ export const delete_outfit_by_id = createAsyncThunk(
         outfit_id: normalized_outfit_id,
       };
     } catch (error) {
-      return rejectWithValue(error?.message ?? 'No se pudo eliminar el outfit');
+      return rejectWithValue(error?.message ?? 'No se pudo eliminar el conjunto');
     }
   }
 );
@@ -45,7 +45,7 @@ export const create_outfit_manual = createAsyncThunk(
       const created_outfit = await create_outfit_in_backend(payload);
       return created_outfit;
     } catch (error) {
-      return rejectWithValue(error?.message ?? 'No se pudo crear el outfit');
+      return rejectWithValue(error?.message ?? 'No se pudo crear el conjunto');
     }
   }
 );
@@ -58,7 +58,7 @@ export const create_outfit_from_ia = createAsyncThunk(
       const created_outfit = await create_outfit_from_ia_in_backend(payload);
       return created_outfit;
     } catch (error) {
-      return rejectWithValue(error?.message ?? 'No se pudo generar el outfit');
+      return rejectWithValue(error?.message ?? 'No se pudo generar el conjunto');
     }
   }
 );
@@ -70,7 +70,7 @@ export const update_outfit_manual = createAsyncThunk(
       const updated_outfit = await update_outfit_in_backend(payload.outfit_id, payload);
       return updated_outfit;
     } catch (error) {
-      return rejectWithValue(error?.message ?? 'No se pudo actualizar el outfit');
+      return rejectWithValue(error?.message ?? 'No se pudo actualizar el conjunto');
     }
   }
 );
@@ -137,7 +137,7 @@ const outfits_slice = createSlice({
         state.status = 'failed';
         state.items = [];
         state.loaded_user_id = null;
-        state.error = action.payload ?? 'No se pudieron cargar los outfits';
+        state.error = action.payload ?? 'No se pudieron cargar los conjuntos';
       })
       .addCase(delete_outfit_by_id.pending, (state) => {
         state.delete_status = 'loading';
@@ -155,7 +155,7 @@ const outfits_slice = createSlice({
       })
       .addCase(delete_outfit_by_id.rejected, (state, action) => {
         state.delete_status = 'failed';
-        state.delete_error = action.payload ?? 'No se pudo eliminar el outfit';
+        state.delete_error = action.payload ?? 'No se pudo eliminar el conjunto';
       });
     builder
       .addCase(create_outfit_manual.pending, (state) => {
@@ -169,7 +169,7 @@ const outfits_slice = createSlice({
       })
       .addCase(create_outfit_manual.rejected, (state, action) => {
         state.create_status = 'failed';
-        state.create_error = action.payload ?? 'No se pudo crear el outfit';
+        state.create_error = action.payload ?? 'No se pudo crear el conjunto';
       });
     builder
       .addCase(create_outfit_from_ia.pending, (state) => {
@@ -183,7 +183,7 @@ const outfits_slice = createSlice({
       })
       .addCase(create_outfit_from_ia.rejected, (state, action) => {
         state.ia_status = 'failed';
-        state.ia_error = action.payload ?? 'No se pudo generar el outfit';
+        state.ia_error = action.payload ?? 'No se pudo generar el conjunto';
       });
     builder
       .addCase(update_outfit_manual.pending, (state) => {
@@ -197,7 +197,7 @@ const outfits_slice = createSlice({
       })
       .addCase(update_outfit_manual.rejected, (state, action) => {
         state.create_status = 'failed';
-        state.create_error = action.payload ?? 'No se pudo actualizar el outfit';
+        state.create_error = action.payload ?? 'No se pudo actualizar el conjunto';
       });
   },
 });

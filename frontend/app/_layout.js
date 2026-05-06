@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { StatusBar } from 'expo-status-bar';
 import { store } from '../src/store/store';
 import { root_stack_screen_options } from '../src/shared/theme/navigation-styles';
-import { AuthListener } from '../src/features/auth/auth-listener';
+import { AuthListener } from '../src/features/auth/state/auth-listener';
 
 export default function RootLayout() {
   return (

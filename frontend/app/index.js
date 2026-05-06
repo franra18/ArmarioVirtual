@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { LoginScreen } from '../src/features/auth/screens/login-screen';
-import { select_is_authenticated } from '../src/features/auth/selectors';
+import { select_is_authenticated } from '../src/features/auth/selectors/auth-selectors';
 import { use_app_selector } from '../src/store/hooks';
 
 export default function LoginRoute() {

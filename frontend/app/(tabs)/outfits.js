@@ -1,5 +1,5 @@
 import { OutfitsScreen } from '../../src/features/outfits/screens/outfits-screen';
 
-export default function ConjuntosRoute() {
+export default function OutfitsRoute() {
   return <OutfitsScreen />;
 }

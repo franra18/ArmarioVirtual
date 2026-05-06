@@ -8,8 +8,8 @@ import {
   select_auth_update_error,
   select_auth_update_status,
   select_auth_user_id,
-} from '../../auth/selectors';
-import { sign_out_session, update_user_profile_name } from '../../auth/auth-slice';
+} from '../../auth/selectors/auth-selectors';
+import { sign_out_session, update_user_profile_name } from '../../auth/state/auth-slice';
 import { account_input_placeholder_color, account_screen_styles } from './account-screen.styles';
 
 export function AccountScreen() {

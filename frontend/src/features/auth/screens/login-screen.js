@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { sign_in_with_email, sign_up_with_email } from '../auth-slice';
-import { select_auth_error, select_auth_status } from '../selectors';
+import { sign_in_with_email, sign_up_with_email } from '../state/auth-slice';
+import { select_auth_error, select_auth_status } from '../selectors/auth-selectors';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { login_input_placeholder_color, login_screen_styles } from './login-screen.styles';
 

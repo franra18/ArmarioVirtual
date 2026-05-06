@@ -34,7 +34,7 @@ class OutfitGenerateFromIARequest(BaseModel):
 		json_schema_extra={
 			"example": {
 				"usuario_id": 3,
-				"prompt": "Quiero un outfit para una cena informal.",
+				"prompt": "Quiero un conjunto para una cena informal.",
 				"lat": 40.42,
 				"lon": -3.7,
 			}

@@ -12,8 +12,8 @@ export const prendas_screen_styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   header_stack: {
-    gap: 12,
-    paddingTop: 10,
+    gap: 20,
+    paddingTop: 15,
     paddingBottom: 14,
   },
   screen_title: {

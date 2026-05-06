@@ -68,7 +68,7 @@ export const home_screen_styles = StyleSheet.create({
   stats_card_title: {
     fontFamily: typography.display,
     color: palette.walnut,
-    fontSize: 34,
+    fontSize: 25,
   },
   stats_card_value: {
     fontFamily: typography.display,

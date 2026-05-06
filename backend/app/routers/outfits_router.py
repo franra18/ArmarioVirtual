@@ -14,9 +14,9 @@ router = APIRouter()
 @router.get(
 	"/",
 	response_model=list[OutfitResponse],
-	summary="Obtener outfits",
-	description="Devuelve la lista completa de outfits registrados.",
-	responses={200: {"description": "Outfits obtenidos correctamente"}},
+		summary="Obtener conjuntos",
+		description="Devuelve la lista completa de conjuntos registrados.",
+		responses={200: {"description": "Conjuntos obtenidos correctamente"}},
 )
 def get_outfits(db: Session = Depends(get_db)):
 	return OutfitCRUD.get_all(db)
@@ -26,17 +26,17 @@ def get_outfits(db: Session = Depends(get_db)):
 @router.get(
 	"/{outfit_id}",
 	response_model=OutfitResponse,
-	summary="Obtener outfit por ID",
-	description="Devuelve los datos de un outfit especifico usando su identificador.",
+		summary="Obtener conjunto por ID",
+		description="Devuelve los datos de un conjunto especifico usando su identificador.",
 	responses={
-		200: {"description": "Outfit encontrado correctamente"},
-		404: {"description": "Outfit no encontrado"},
+			200: {"description": "Conjunto encontrado correctamente"},
+			404: {"description": "Conjunto no encontrado"},
 	},
 )
 def get_outfit_by_id(outfit_id: int, db: Session = Depends(get_db)):
 	outfit = OutfitCRUD.get_by_id(db, outfit_id)
 	if outfit is None:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Outfit no encontrado")
+			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conjunto no encontrado")
 	return outfit
 
 
@@ -45,9 +45,9 @@ def get_outfit_by_id(outfit_id: int, db: Session = Depends(get_db)):
 	"/",
 	response_model=OutfitResponse,
 	status_code=status.HTTP_201_CREATED,
-	summary="Crear outfit",
-	description="Crea un nuevo outfit con los datos enviados en el body.",
-	responses={201: {"description": "Outfit creado correctamente"}},
+		summary="Crear conjunto",
+		description="Crea un nuevo conjunto con los datos enviados en el body.",
+		responses={201: {"description": "Conjunto creado correctamente"}},
 )
 def create_outfit(data: OutfitCreate, db: Session = Depends(get_db)):
 	try:
@@ -61,10 +61,10 @@ def create_outfit(data: OutfitCreate, db: Session = Depends(get_db)):
 	"/generar-desde-ia",
 	response_model=OutfitResponse,
 	status_code=status.HTTP_201_CREATED,
-	summary="Generar outfit desde IA",
-	description="Genera un outfit con IA desde prompt, prendas del usuario y clima opcional.",
+		summary="Generar conjunto desde IA",
+		description="Genera un conjunto con IA desde prompt, prendas del usuario y clima opcional.",
 	responses={
-		201: {"description": "Outfit generado y guardado correctamente"},
+			201: {"description": "Conjunto generado y guardado correctamente"},
 		400: {"description": "Error de validacion de negocio"},
 		422: {"description": "Payload o respuesta IA invalida"},
 		502: {"description": "Fallo de servicios externos"},
@@ -85,11 +85,11 @@ def create_outfit_from_ia(data: OutfitGenerateFromIARequest, db: Session = Depen
 @router.put(
 	"/{outfit_id}",
 	response_model=OutfitResponse,
-	summary="Actualizar outfit",
-	description="Actualiza los datos de un outfit existente por su identificador.",
+		summary="Actualizar conjunto",
+		description="Actualiza los datos de un conjunto existente por su identificador.",
 	responses={
-		200: {"description": "Outfit actualizado correctamente"},
-		404: {"description": "Outfit no encontrado"},
+			200: {"description": "Conjunto actualizado correctamente"},
+			404: {"description": "Conjunto no encontrado"},
 	},
 )
 def update_outfit(outfit_id: int, data: OutfitUpdate, db: Session = Depends(get_db)):
@@ -99,22 +99,22 @@ def update_outfit(outfit_id: int, data: OutfitUpdate, db: Session = Depends(get_
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 	if outfit is None:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Outfit no encontrado")
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conjunto no encontrado")
 	return outfit
 
 
 # Endpoint para eliminar un outfit por ID.
 @router.delete(
 	"/{outfit_id}",
-	summary="Eliminar outfit",
-	description="Elimina un outfit existente utilizando su identificador.",
+		summary="Eliminar conjunto",
+		description="Elimina un conjunto existente utilizando su identificador.",
 	responses={
-		200: {"description": "Outfit eliminado correctamente"},
-		404: {"description": "Outfit no encontrado"},
+			200: {"description": "Conjunto eliminado correctamente"},
+			404: {"description": "Conjunto no encontrado"},
 	},
 )
 def delete_outfit(outfit_id: int, db: Session = Depends(get_db)):
 	eliminado = OutfitCRUD.delete(db, outfit_id)
 	if not eliminado:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Outfit no encontrado")
-	return {"message": "Outfit eliminado correctamente"}
+			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conjunto no encontrado")
+	return {"message": "Conjunto eliminado correctamente"}

@@ -263,12 +263,12 @@ export function PrendasScreen() {
 
   const handle_select_manual_add = () => {
     set_is_add_options_open(false);
-    router.push('/prendas/nueva-manual');
+    router.push('/prendas/nueva-prenda-manual');
   };
 
   const handle_select_ia_add = () => {
     set_is_add_options_open(false);
-    router.push('/prendas/nueva-ia');
+    router.push('/prendas/nueva-prenda-ia');
   };
 
   if (!auth_user_id) {

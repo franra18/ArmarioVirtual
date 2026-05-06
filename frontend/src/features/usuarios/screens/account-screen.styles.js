@@ -10,9 +10,9 @@ export const account_screen_styles = StyleSheet.create({
   },
   screen_content: {
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 15,
     paddingBottom: 40,
-    gap: 16,
+    gap: 20,
   },
   header: {
     gap: 6,
@@ -20,7 +20,7 @@ export const account_screen_styles = StyleSheet.create({
   title: {
     fontFamily: typography.display,
     color: palette.walnut_deep,
-    fontSize: 42,
+    fontSize: 41,
     textAlign: 'center',
   },
   subtitle: {

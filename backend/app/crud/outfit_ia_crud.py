@@ -85,7 +85,7 @@ class OutfitIACRUD:
 			tipo_por_prenda[prenda.id] = (prenda.tipo_prenda or "").strip().lower()
 
 		if not prendas_data:
-			raise ValueError("No hay prendas con colores asociados para generar un outfit")
+			raise ValueError("No hay prendas con colores asociados para generar un conjunto")
 
 		return prendas_data, tipo_por_prenda
 
@@ -143,7 +143,7 @@ class OutfitIACRUD:
 			ids_limpios.append(prenda_id)
 
 		if not ids_limpios:
-			raise ValueError("La IA no devolvio prendas para el outfit")
+			raise ValueError("La IA no devolvio prendas para el conjunto")
 
 		if any(prenda_id not in prenda_ids_validos for prenda_id in ids_limpios):
 			raise ValueError("La IA devolvio prendas que no pertenecen al usuario")

@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { PrendaCreateManualScreen } from '../../../src/features/prendas/screens/prenda-create-manual-screen';
-import { select_auth_user_id } from '../../../src/features/auth/selectors';
+import { select_auth_user_id } from '../../../src/features/auth/selectors/auth-selectors';
 import { fetch_prendas_for_user } from '../../../src/features/prendas/state/prendas-slice';
 import { select_prendas_items, select_prendas_status } from '../../../src/features/prendas/selectors/prendas-selectors';
 import { use_app_dispatch, use_app_selector } from '../../../src/store/hooks';

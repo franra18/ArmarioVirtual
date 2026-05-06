@@ -103,7 +103,7 @@ export async function create_outfit_from_ia_in_backend(payload) {
 export async function delete_outfit_from_backend(outfit_id) {
   const normalized_outfit_id = parse_positive_int(outfit_id);
   if (!normalized_outfit_id) {
-    throw new Error('El id de outfit debe ser un numero entero positivo');
+    throw new Error('El id de conjunto debe ser un numero entero positivo');
   }
 
   await delete_json(`/api/outfits/${normalized_outfit_id}`);
@@ -112,7 +112,7 @@ export async function delete_outfit_from_backend(outfit_id) {
 export async function update_outfit_in_backend(outfit_id, payload) {
   const normalized_outfit_id = parse_positive_int(outfit_id);
   if (!normalized_outfit_id) {
-    throw new Error('El id de outfit debe ser un numero entero positivo');
+    throw new Error('El id de conjunto debe ser un numero entero positivo');
   }
 
   const normalized_payload = normalize_outfit_payload(payload);
