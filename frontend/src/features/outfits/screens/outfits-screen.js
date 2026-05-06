@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'r
 import { useRouter } from 'expo-router';
 import { useScrollToTop } from '@react-navigation/native';
 import { palette } from '../../../shared/theme/palette';
-import { FilterIcon, SearchIcon, SparklesIcon } from '../../../shared/icons/app-icons';
+import { FilterIcon, HeartIcon, SearchIcon, SparklesIcon } from '../../../shared/icons/app-icons';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { select_auth_user_id } from '../../auth/selectors';
 import { fetch_prendas_for_user } from '../../prendas/state/prendas-slice';
@@ -76,6 +76,8 @@ export function OutfitsScreen() {
 
   const [search_term, set_search_term] = useState('');
   const [is_favorites_filter_active, set_is_favorites_filter_active] = useState(false);
+  const [is_filter_card_open, set_is_filter_card_open] = useState(false);
+  const [added_sort_order, set_added_sort_order] = useState('newest');
 
   useEffect(() => {
     if (!auth_user_id || outfits_status === 'loading') {
@@ -152,11 +154,11 @@ export function OutfitsScreen() {
     outfits_filtrados.sort((left_outfit, right_outfit) => {
       const left_value = get_outfit_added_sort_value(left_outfit);
       const right_value = get_outfit_added_sort_value(right_outfit);
-      return right_value - left_value;
+      return added_sort_order === 'oldest' ? left_value - right_value : right_value - left_value;
     });
 
     return outfits_filtrados;
-  }, [auth_user_id, favorite_id_set, is_favorites_filter_active, outfits, search_term]);
+  }, [added_sort_order, auth_user_id, favorite_id_set, is_favorites_filter_active, outfits, search_term]);
 
   const is_loading_initial = outfits_status === 'loading' && outfits.length === 0;
   const has_error = Boolean(outfits_error);
@@ -175,6 +177,16 @@ export function OutfitsScreen() {
     }
 
     dispatch(fetch_outfits_for_user(auth_user_id));
+  };
+
+  const has_advanced_filters = added_sort_order !== 'newest';
+
+  const clear_filters = () => {
+    set_added_sort_order('newest');
+  };
+
+  const toggle_filter_card = () => {
+    set_is_filter_card_open((is_open) => !is_open);
   };
 
   // Abre la pantalla de generacion con IA.
@@ -264,9 +276,25 @@ export function OutfitsScreen() {
                   is_favorites_filter_active ? outfits_screen_styles.icon_action_button_active : null,
                 ]}
               >
+                <HeartIcon
+                  size={14}
+                  solid={is_favorites_filter_active}
+                  color={is_favorites_filter_active ? palette.white : palette.walnut}
+                />
+              </Pressable>
+
+              <Pressable
+                onPress={toggle_filter_card}
+                style={[
+                  outfits_screen_styles.icon_action_button,
+                  is_filter_card_open || has_advanced_filters
+                    ? outfits_screen_styles.icon_action_button_active
+                    : null,
+                ]}
+              >
                 <FilterIcon
                   size={14}
-                  color={is_favorites_filter_active ? palette.white : palette.walnut}
+                  color={(is_filter_card_open || has_advanced_filters) ? palette.white : palette.walnut}
                 />
               </Pressable>
 
@@ -279,6 +307,73 @@ export function OutfitsScreen() {
                 </Text>
               </Pressable>
             </View>
+
+            {is_filter_card_open && (
+              <View style={outfits_screen_styles.filter_card}>
+                <View style={outfits_screen_styles.filter_section}>
+                  <Text selectable style={outfits_screen_styles.filter_label}>
+                    AÑADIDO
+                  </Text>
+                  <View style={outfits_screen_styles.filter_choice_row}>
+                    <Pressable
+                      onPress={() => set_added_sort_order('newest')}
+                      style={[
+                        outfits_screen_styles.filter_choice_chip,
+                        added_sort_order === 'newest'
+                          ? outfits_screen_styles.filter_choice_chip_active
+                          : null,
+                      ]}
+                    >
+                      <Text
+                        selectable
+                        style={[
+                          outfits_screen_styles.filter_choice_chip_text,
+                          added_sort_order === 'newest'
+                            ? outfits_screen_styles.filter_choice_chip_text_active
+                            : null,
+                        ]}
+                      >
+                        Más reciente
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => set_added_sort_order('oldest')}
+                      style={[
+                        outfits_screen_styles.filter_choice_chip,
+                        added_sort_order === 'oldest'
+                          ? outfits_screen_styles.filter_choice_chip_active
+                          : null,
+                      ]}
+                    >
+                      <Text
+                        selectable
+                        style={[
+                          outfits_screen_styles.filter_choice_chip_text,
+                          added_sort_order === 'oldest'
+                            ? outfits_screen_styles.filter_choice_chip_text_active
+                            : null,
+                        ]}
+                      >
+                        Más antiguo
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+
+                <View style={outfits_screen_styles.filter_actions_row}>
+                  <Pressable onPress={clear_filters} style={outfits_screen_styles.filter_action_button_secondary}>
+                    <Text selectable style={outfits_screen_styles.filter_action_button_secondary_text}>
+                      Limpiar
+                    </Text>
+                  </Pressable>
+                  <Pressable onPress={toggle_filter_card} style={outfits_screen_styles.filter_action_button_primary}>
+                    <Text selectable style={outfits_screen_styles.filter_action_button_primary_text}>
+                      Cerrar
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
 
             <Pressable style={outfits_screen_styles.ia_card} onPress={handle_open_ia}>
               <View style={outfits_screen_styles.ia_card_left}>

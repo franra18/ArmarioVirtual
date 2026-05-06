@@ -21,7 +21,7 @@ import {
   select_prendas_status,
 } from '../selectors/prendas-selectors';
 import { prendas_screen_styles, search_input_placeholder_color } from './prendas-screen.styles';
-import { SparklesIcon } from '../../../shared/icons/app-icons';
+import { HeartIcon, SparklesIcon } from '../../../shared/icons/app-icons';
 
 const elegance_level_options = [
   { value: null, label: 'Todos' },
@@ -342,6 +342,20 @@ export function PrendasScreen() {
               </View>
 
               <Pressable
+                onPress={() => set_is_favorites_filter_active((is_active) => !is_active)}
+                style={[
+                  prendas_screen_styles.icon_action_button,
+                  is_favorites_filter_active ? prendas_screen_styles.icon_action_button_active : null,
+                ]}
+              >
+                <HeartIcon
+                  size={14}
+                  solid={is_favorites_filter_active}
+                  color={is_favorites_filter_active ? palette.white : palette.walnut}
+                />
+              </Pressable>
+
+              <Pressable
                 onPress={toggle_filter_card}
                 style={[
                   prendas_screen_styles.icon_action_button,
@@ -484,24 +498,6 @@ export function PrendasScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={prendas_screen_styles.filters_scroll_content}
             >
-              <Pressable
-                onPress={() => set_is_favorites_filter_active((is_active) => !is_active)}
-                style={[
-                  prendas_screen_styles.filter_chip,
-                  is_favorites_filter_active ? prendas_screen_styles.filter_chip_active : null,
-                ]}
-              >
-                <Text
-                  selectable
-                  style={[
-                    prendas_screen_styles.filter_chip_text,
-                    is_favorites_filter_active ? prendas_screen_styles.filter_chip_text_active : null,
-                  ]}
-                >
-                  Favoritos
-                </Text>
-              </Pressable>
-
               {category_options.map((category) => {
                 const is_active = category.id === selected_category_id;
                 return (

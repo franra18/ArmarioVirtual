@@ -58,6 +58,82 @@ export const outfits_screen_styles = StyleSheet.create({
   icon_action_button_active: {
     backgroundColor: palette.walnut,
   },
+  filter_card: {
+    borderRadius: 20,
+    borderCurve: 'continuous',
+    backgroundColor: palette.cream_deep,
+    padding: 12,
+    gap: 12,
+    boxShadow: '0 8px 14px rgba(74, 51, 30, 0.12)',
+  },
+  filter_section: {
+    gap: 8,
+  },
+  filter_label: {
+    color: palette.walnut_deep,
+    fontFamily: typography.body_medium,
+    fontSize: 13,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  filter_choice_row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  filter_choice_chip: {
+    borderRadius: 14,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.sky_deep,
+    backgroundColor: palette.cream,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  filter_choice_chip_active: {
+    borderColor: palette.walnut,
+    backgroundColor: palette.walnut,
+  },
+  filter_choice_chip_text: {
+    color: palette.walnut,
+    fontFamily: typography.body,
+    fontSize: 13,
+  },
+  filter_choice_chip_text_active: {
+    color: palette.white,
+    fontFamily: typography.body_medium,
+  },
+  filter_actions_row: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  filter_action_button_secondary: {
+    borderRadius: 12,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.walnut_soft,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: palette.cream,
+  },
+  filter_action_button_secondary_text: {
+    color: palette.walnut,
+    fontFamily: typography.body_medium,
+    fontSize: 13,
+  },
+  filter_action_button_primary: {
+    borderRadius: 12,
+    borderCurve: 'continuous',
+    backgroundColor: palette.walnut,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  filter_action_button_primary_text: {
+    color: palette.white,
+    fontFamily: typography.body_medium,
+    fontSize: 13,
+  },
   add_button: {
     height: 44,
     paddingHorizontal: 16,
