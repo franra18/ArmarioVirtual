@@ -1,26 +1,11 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
-from app.models.outfit_prenda_model import OutfitPrenda
 from app.models.outfit_model import Outfit
 from app.models.prenda_model import Prenda
 from app.schemas.outfit_schema import OutfitCreate, OutfitUpdate
 
 
 class OutfitCRUD:
-	# Construir el payload de respuesta incluyendo las prendas asociadas.
-	@staticmethod
-	def _armar_outfit_respuesta(db: Session, outfit: Outfit) -> dict:
-		prenda_rows = db.query(OutfitPrenda).filter(OutfitPrenda.outfit_id == outfit.id).all()
-		prenda_ids = [row.prenda_id for row in prenda_rows]
-		return {
-			"id": outfit.id,
-			"usuario_id": outfit.usuario_id,
-			"nombre_outfit": outfit.nombre_outfit,
-			"ocasion": outfit.ocasion,
-			"creado_por_ia": outfit.creado_por_ia,
-			"fecha_creacion": outfit.fecha_creacion,
-			"prenda_ids": prenda_ids,
-		}
 	# Normalizar y depurar la lista de IDs de prendas recibida.
 	@staticmethod
 	def _normalizar_prenda_ids(prenda_ids: list[int]) -> list[int]:
@@ -34,49 +19,38 @@ class OutfitCRUD:
 		if cantidad_existentes != len(prenda_ids):
 			raise ValueError("Una o mas prendas no existen")
 
-	# Verificar que un outfit tenga al menos una prenda asociada.
+	# Obtener todas los outfits registrados.
 	@staticmethod
-	def _validar_prendas_obligatorias(db: Session, outfit_id: int) -> None:
-		tiene_prendas = db.query(OutfitPrenda).filter(OutfitPrenda.outfit_id == outfit_id).first()
-		if not tiene_prendas:
-			raise ValueError("El conjunto debe tener al menos una prenda")
-
-	# Obtener todos los outfits registrados.
-	@staticmethod
-	def get_all(db: Session) -> list[dict]:
-		outfits = db.query(Outfit).all()
-		return [OutfitCRUD._armar_outfit_respuesta(db, outfit) for outfit in outfits]
-
-	# Obtener un outfit por su identificador.
-	@staticmethod
-	def get_by_id(db: Session, outfit_id: int) -> dict | None:
-		outfit = db.query(Outfit).filter(Outfit.id == outfit_id).first()
-		if not outfit:
-			return None
-		return OutfitCRUD._armar_outfit_respuesta(db, outfit)
+	def get_all(db: Session) -> list[Outfit]: # Fíjate que devolvemos la clase Outfit (importada de models)
+		return db.query(Outfit).all()
 
 	# Obtener todos los outfits asociados a un usuario.
 	@staticmethod
-	def get_by_usuario_id(db: Session, usuario_id: int) -> list[dict]:
-		outfits = db.query(Outfit).filter(Outfit.usuario_id == usuario_id).all()
-		return [OutfitCRUD._armar_outfit_respuesta(db, outfit) for outfit in outfits]
+	def get_by_usuario_id(db: Session, usuario_id: int) -> list[Outfit]:
+		return db.query(Outfit).filter(Outfit.usuario_id == usuario_id).order_by(Outfit.id.desc()).all()
+
+	# Obtener un outfit por su identificador.
+	@staticmethod
+	def get_by_id(db: Session, outfit_id: int) -> Outfit | None:
+		return db.query(Outfit).filter(Outfit.id == outfit_id).first()
 
 	# Crear un nuevo outfit con los datos recibidos.
 	@staticmethod
-	def create(db: Session, data: OutfitCreate) -> dict:
+	def create(db: Session, data: OutfitCreate) -> Outfit:
 		prenda_ids = OutfitCRUD._normalizar_prenda_ids(data.prenda_ids)
 		if not prenda_ids:
 			raise ValueError("El conjunto debe tener al menos una prenda")
 
 		OutfitCRUD._validar_prendas_existentes(db, prenda_ids)
 
-		nuevo_outfit = Outfit(**data.model_dump(exclude={"prenda_ids"}))
+		# Traer los objetos Prenda de la BD
+		prendas_db = db.query(Prenda).filter(Prenda.id.in_(prenda_ids)).all()
+
+		# Crear el Outfit pasándole la lista de objetos Prenda
+		outfit_data = data.model_dump(exclude={"prenda_ids"})
+		nuevo_outfit = Outfit(**outfit_data, prendas=prendas_db)
+
 		db.add(nuevo_outfit)
-		db.flush()
-
-		for prenda_id in prenda_ids:
-			db.add(OutfitPrenda(outfit_id=nuevo_outfit.id, prenda_id=prenda_id))
-
 		try:
 			db.commit()
 		except Exception:
@@ -84,11 +58,11 @@ class OutfitCRUD:
 			raise
 
 		db.refresh(nuevo_outfit)
-		return OutfitCRUD._armar_outfit_respuesta(db, nuevo_outfit)
+		return nuevo_outfit
 
 	# Actualizar los campos enviados de un outfit existente.
 	@staticmethod
-	def update(db: Session, outfit_id: int, data: OutfitUpdate) -> dict | None:
+	def update(db: Session, outfit_id: int, data: OutfitUpdate) -> Outfit | None:
 		outfit = db.query(Outfit).filter(Outfit.id == outfit_id).first()
 		if not outfit:
 			return None
@@ -103,19 +77,19 @@ class OutfitCRUD:
 				raise ValueError("El conjunto debe tener al menos una prenda")
 
 			OutfitCRUD._validar_prendas_existentes(db, prenda_ids)
-			db.query(OutfitPrenda).filter(OutfitPrenda.outfit_id == outfit_id).delete(synchronize_session=False)
-			for prenda_id in prenda_ids:
-				db.add(OutfitPrenda(outfit_id=outfit_id, prenda_id=prenda_id))
-		else:
-			OutfitCRUD._validar_prendas_obligatorias(db, outfit_id)
+
+			# Traer los objetos Prenda de la BD y actualizar la relación
+			prendas_db = db.query(Prenda).filter(Prenda.id.in_(prenda_ids)).all()
+			outfit.prendas = prendas_db
 
 		try:
 			db.commit()
 		except Exception:
 			db.rollback()
 			raise
+
 		db.refresh(outfit)
-		return OutfitCRUD._armar_outfit_respuesta(db, outfit)
+		return outfit
 
 	# Eliminar un outfit por su identificador.
 	@staticmethod
@@ -125,5 +99,9 @@ class OutfitCRUD:
 			return False
 
 		db.delete(outfit)
-		db.commit()
+		try:
+			db.commit()
+		except Exception:
+			db.rollback()
+			raise
 		return True

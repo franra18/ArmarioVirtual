@@ -50,7 +50,7 @@ class PrendaIAData(BaseModel):
 
 class PrendaCreateFromImageIARequest(BaseModel):
 	image_url: HttpUrl
-	usuario_id: int = Field(default=1, ge=1)
+	usuario_id: int = Field(ge=1)
 
 	model_config = ConfigDict(
 		json_schema_extra={

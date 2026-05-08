@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.crud.color_crud import ColorCRUD
 from app.crud.ia_utils import create_ia_client, generate_ia_structured, get_criterios_abrigo_elegancia
 from app.crud.prenda_crud import PrendaCRUD
+from app.models.color_model import Color
 from app.models.prenda_model import Prenda
 from app.schemas.color_schema import ColorCreate
 from app.schemas.prenda_schema import PrendaCreate, PrendaCreateFromImageIARequest, PrendaIAData
@@ -61,51 +62,29 @@ class PrendaIACRUD:
 	# Resolver IDs de color: reutilizar existentes por nombre exacto normalizado y crear faltantes.
 	@staticmethod
 	def _resolver_color_ids(db: Session, ia_data: PrendaIAData) -> list[int]:
-		color_ids_resueltos: list[int] = []
-		colores_existentes = ColorCRUD.get_all(db)
-		ids_existentes = {color.id for color in colores_existentes}
-		id_por_nombre = {
-			PrendaIACRUD._normalizar_nombre_color(color.nombre): color.id
-			for color in colores_existentes
-			if (color.nombre or "").strip()
-		}
+		color_ids_resueltos = list(set(ia_data.color_ids or []))
 
-		for color_id in ia_data.color_ids or []:
-			if color_id in ids_existentes and color_id not in color_ids_resueltos:
-				color_ids_resueltos.append(color_id)
+		nombres_nuevos = [PrendaIACRUD._normalizar_nombre_color(n) for n in (ia_data.color_nombres or [])]
+		nombres_nuevos = [n for n in nombres_nuevos if n]
 
-		nombres_nuevos: list[str] = []
-		nombres_nuevos_normalizados: set[str] = set()
-		for nombre_color in ia_data.color_nombres or []:
-			nombre_limpio = (nombre_color or "").strip()
-			if not nombre_limpio:
-				continue
+		if nombres_nuevos:
+			# Buscar en BD SOLO los colores que la IA detectó
+			colores_db = db.query(Color).filter(Color.nombre.in_(nombres_nuevos)).all()
+			nombres_encontrados = {color.nombre: color.id for color in colores_db}
 
-			nombre_normalizado = PrendaIACRUD._normalizar_nombre_color(nombre_limpio)
-			if not nombre_normalizado:
-				continue
+			# Agregar los IDs encontrados
+			color_ids_resueltos.extend(nombres_encontrados.values())
 
-			color_existente_id = id_por_nombre.get(nombre_normalizado)
-			if color_existente_id is not None:
-				if color_existente_id not in color_ids_resueltos:
-					color_ids_resueltos.append(color_existente_id)
-				continue
-
-			if nombre_normalizado in nombres_nuevos_normalizados:
-				continue
-
-			nombres_nuevos_normalizados.add(nombre_normalizado)
-			nombres_nuevos.append(nombre_limpio)
-
-		for nombre_nuevo in nombres_nuevos:
-			nuevo_color = ColorCRUD.create(db, ColorCreate(nombre=nombre_nuevo))
-			if nuevo_color.id not in color_ids_resueltos:
-				color_ids_resueltos.append(nuevo_color.id)
+			# Crear los que realmente no existen
+			for nombre in nombres_nuevos:
+				if nombre not in nombres_encontrados:
+					nuevo_color = ColorCRUD.create(db, ColorCreate(nombre=nombre))
+					color_ids_resueltos.append(nuevo_color.id)
 
 		if not color_ids_resueltos:
 			raise ValueError("La IA no devolvio colores validos para asociar a la prenda")
 
-		return color_ids_resueltos
+		return list(set(color_ids_resueltos))
 
 	# Procesar una imagen con IA, validar el JSON y crear la prenda en BD.
 	@staticmethod

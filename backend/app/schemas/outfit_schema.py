@@ -1,7 +1,6 @@
 from datetime import datetime
-from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class OutfitCreate(BaseModel):
@@ -17,18 +16,6 @@ class OutfitGenerateFromIARequest(BaseModel):
 	prompt: str = Field(min_length=1, max_length=250)
 	lat: float | None = None
 	lon: float | None = None
-
-	# Validar que latitud y longitud no tengan mas de 2 decimales.
-	@field_validator("lat", "lon")
-	@classmethod
-	def validar_maximo_dos_decimales(cls, value: float | None) -> float | None:
-		if value is None:
-			return value
-
-		if Decimal(str(value)).as_tuple().exponent < -2:
-			raise ValueError("El valor debe tener como maximo 2 decimales")
-
-		return value
 
 	model_config = ConfigDict(
 		json_schema_extra={
@@ -68,12 +55,12 @@ class OutfitUpdate(BaseModel):
 
 
 class OutfitResponse(BaseModel):
-	id: int
-	usuario_id: int
-	nombre_outfit: str | None = None
-	ocasion: str | None = None
-	creado_por_ia: bool | None = None
-	prenda_ids: list[int] | None = None
-	fecha_creacion: datetime | None = None
+    id: int
+    usuario_id: int
+    nombre_outfit: str | None = None
+    ocasion: str | None = None
+    creado_por_ia: bool | None = None
+    prenda_ids: list[int] = Field(default_factory=list)
+    fecha_creacion: datetime | None = None
 
-	model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)

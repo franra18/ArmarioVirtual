@@ -21,38 +21,6 @@ function normalize_manual_prenda_payload(payload) {
   };
 }
 
-function validate_manual_prenda_payload(normalized_payload) {
-  if (!normalized_payload.usuario_id) {
-    throw new Error('El usuario no es valido');
-  }
-
-  if (!normalized_payload.nombre) {
-    throw new Error('El nombre es obligatorio');
-  }
-
-  if (!normalized_payload.tipo_prenda) {
-    throw new Error('El tipo de prenda es obligatorio');
-  }
-
-  if (!normalized_payload.color_ids.length) {
-    throw new Error('Debes seleccionar al menos un color');
-  }
-
-  if (
-    normalized_payload.nivel_abrigo != null
-    && (normalized_payload.nivel_abrigo < 1 || normalized_payload.nivel_abrigo > 5)
-  ) {
-    throw new Error('El nivel de abrigo debe estar entre 1 y 5');
-  }
-
-  if (
-    normalized_payload.nivel_elegancia != null
-    && (normalized_payload.nivel_elegancia < 1 || normalized_payload.nivel_elegancia > 5)
-  ) {
-    throw new Error('El nivel de elegancia debe estar entre 1 y 5');
-  }
-}
-
 export async function fetch_prendas_for_user_from_backend(user_id) {
   const normalized_user_id = parse_positive_int(user_id);
   if (!normalized_user_id) {
@@ -90,7 +58,6 @@ export async function create_color_in_backend(nombre_color) {
 
 export async function create_prenda_manual_in_backend(payload) {
   const normalized_payload = normalize_manual_prenda_payload(payload);
-  validate_manual_prenda_payload(normalized_payload);
 
   return post_json('/api/prendas/', normalized_payload);
 }
@@ -102,7 +69,6 @@ export async function update_prenda_manual_in_backend(prenda_id, payload) {
   }
 
   const normalized_payload = normalize_manual_prenda_payload(payload);
-  validate_manual_prenda_payload(normalized_payload);
 
   return put_json(`/api/prendas/${normalized_prenda_id}`, normalized_payload);
 }

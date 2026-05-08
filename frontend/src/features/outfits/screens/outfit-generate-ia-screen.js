@@ -214,7 +214,7 @@ export function OutfitGenerateIaScreen() {
             A donde vas?
           </Text>
           <Text selectable style={outfit_generate_ia_styles.section_subtitle}>
-            Cuentame el plan y compongo un conjunto con tu ropa.
+            Cuéntame el plan y compongo un conjunto con tu ropa.
           </Text>
 
           <View style={outfit_generate_ia_styles.prompt_card}>

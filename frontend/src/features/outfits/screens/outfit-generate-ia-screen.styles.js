@@ -111,8 +111,9 @@ export const outfit_generate_ia_styles = StyleSheet.create({
   section_label: {
     color: palette.walnut,
     fontFamily: typography.body_medium,
-    fontSize: 12,
+    fontSize: 14,
     letterSpacing: 0.6,
+    fontWeight: '500',
   },
   section_hint: {
     color: palette.text_muted,
@@ -132,8 +133,9 @@ export const outfit_generate_ia_styles = StyleSheet.create({
   clima_label: {
     color: palette.walnut,
     fontFamily: typography.body_medium,
-    fontSize: 12,
+    fontSize: 14,
     letterSpacing: 0.6,
+    fontWeight: '500',
   },
   clima_hint: {
     color: palette.text_muted,
