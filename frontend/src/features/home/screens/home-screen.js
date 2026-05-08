@@ -13,6 +13,10 @@ import {
   select_prendas_status,
 } from '../../prendas/selectors/prendas-selectors';
 import {
+  select_outfits_items,
+  select_outfits_status,
+} from '../../outfits/selectors/outfits-selectors';
+import {
   ChevronRightIcon,
   ShirtIcon,
   SparklesIcon,
@@ -42,11 +46,18 @@ export function HomeScreen() {
   const prendas = use_app_selector(select_prendas_items);
   const prendas_status = use_app_selector(select_prendas_status);
   const prendas_loaded_user_id = use_app_selector(select_prendas_loaded_user_id);
+  const outfits = use_app_selector(select_outfits_items);
+  const outfits_status = use_app_selector(select_outfits_status);
   const [weather_data, set_weather_data] = useState(null);
   const [weather_status, set_weather_status] = useState('idle');
   const nombre = profile?.nombre ?? 'Usuario';
-  const prendas_total = profile?.prendas_total ?? 0;
-  const outfits_total = profile?.outfits_total ?? 0;
+  const prendas_total = prendas_status === 'succeeded' 
+    ? prendas.length 
+    : (profile?.prendas_total ?? 0);
+
+  const outfits_total = outfits_status === 'succeeded' 
+    ? outfits.length 
+    : (profile?.outfits_total ?? 0);
 
   useEffect(() => {
     if (!auth_user_id || prendas_status === 'loading') {
