@@ -6,3 +6,5 @@ progreso.txt
 /.agents
 skills-lock.json
 *.example
+backend/test_armario.db
+backend/test_prendas.db
