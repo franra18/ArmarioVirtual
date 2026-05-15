@@ -74,7 +74,7 @@ export async function upload_local_image_to_cloudinary({ local_uri, file_name, m
     );
   }
 
-  const normalized_file_name = String(file_name ?? '').trim() || `prenda.${resolve_file_extension(normalized_local_uri)}`;
+  const normalized_file_name = `prenda_${Date.now()}.${resolve_file_extension(normalized_local_uri)}`;
   const normalized_mime_type = resolve_mime_type(normalized_file_name, mime_type);
 
   const form_data = new FormData();

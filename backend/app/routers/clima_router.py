@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.crud.clima_crud import ClimaCRUD
-from app.schemas.clima_schema import ClimaActualResponse
+from app.schemas.clima_schema import ClimaActualQuery, ClimaActualResponse
 
 router = APIRouter()
 
@@ -19,10 +19,9 @@ router = APIRouter()
 	},
 )
 def get_clima_actual(
-	lat: float = Query(..., ge=-90, le=90, description="Latitud en grados decimales"),
-	lon: float = Query(..., ge=-180, le=180, description="Longitud en grados decimales"),
+	query: ClimaActualQuery = Depends(),
 ):
 	try:
-		return ClimaCRUD.get_clima_actual(lat, lon)
+		return ClimaCRUD.get_clima_actual(query.lat, query.lon)
 	except RuntimeError as e:
 		raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))

@@ -6,6 +6,7 @@ import {
   fetch_outfits_from_backend,
   update_outfit_in_backend,
 } from '../api/outfits-api';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 
 export const fetch_outfits_for_user = createAsyncThunk(
   'outfits/fetch_outfits_for_user',
@@ -25,8 +26,12 @@ export const fetch_outfits_for_user = createAsyncThunk(
 
 export const delete_outfit_by_id = createAsyncThunk(
   'outfits/delete_outfit_by_id',
-  async (outfit_id, { rejectWithValue }) => {
+  async (outfit_id, { rejectWithValue, getState }) => {
     try {
+      const auth_user_id = select_auth_user_id(getState());
+      if (!auth_user_id) {
+        throw new Error('Debes iniciar sesion para eliminar conjuntos');
+      }
       const normalized_outfit_id = String(outfit_id ?? '').trim();
       await delete_outfit_from_backend(normalized_outfit_id);
       return {
@@ -65,8 +70,12 @@ export const create_outfit_from_ia = createAsyncThunk(
 
 export const update_outfit_manual = createAsyncThunk(
   'outfits/update_outfit_manual',
-  async (payload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue, getState }) => {
     try {
+      const auth_user_id = select_auth_user_id(getState());
+      if (!auth_user_id) {
+        throw new Error('Debes iniciar sesion para editar conjuntos');
+      }
       const updated_outfit = await update_outfit_in_backend(payload.outfit_id, payload);
       return updated_outfit;
     } catch (error) {

@@ -7,6 +7,7 @@ import {
   sign_up_with_email_password,
   update_user_name_in_backend,
 } from '../api/auth-api';
+import { select_auth_user_id } from '../selectors/auth-selectors';
 
 export const sign_in_with_email = createAsyncThunk(
   'auth/sign_in_with_email',
@@ -57,8 +58,12 @@ export const sign_out_session = createAsyncThunk(
 
 export const update_user_profile_name = createAsyncThunk(
   'auth/update_user_profile_name',
-  async ({ user_id, nombre }, { rejectWithValue }) => {
+  async ({ user_id, nombre }, { rejectWithValue, getState }) => {
     try {
+      const auth_user_id = select_auth_user_id(getState());
+      if (!auth_user_id || String(auth_user_id) !== String(user_id)) {
+        throw new Error('Debes iniciar sesion para editar el perfil');
+      }
       await update_user_name_in_backend(user_id, nombre);
       return await fetch_user_profile_from_backend(user_id);
     } catch (error) {

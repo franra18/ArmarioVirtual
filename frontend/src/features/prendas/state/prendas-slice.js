@@ -6,6 +6,7 @@ import {
   fetch_prendas_for_user_from_backend,
   update_prenda_manual_in_backend,
 } from '../api/prendas-api';
+import { select_auth_user_id } from '../../auth/selectors/auth-selectors';
 
 export const fetch_prendas_for_user = createAsyncThunk(
   'prendas/fetch_prendas_for_user',
@@ -25,8 +26,12 @@ export const fetch_prendas_for_user = createAsyncThunk(
 
 export const delete_prenda_by_id = createAsyncThunk(
   'prendas/delete_prenda_by_id',
-  async (prenda_id, { rejectWithValue }) => {
+  async (prenda_id, { rejectWithValue, getState }) => {
     try {
+      const auth_user_id = select_auth_user_id(getState());
+      if (!auth_user_id) {
+        throw new Error('Debes iniciar sesion para eliminar prendas');
+      }
       const normalized_prenda_id = String(prenda_id ?? '').trim();
       await delete_prenda_from_backend(normalized_prenda_id);
       return {
@@ -52,8 +57,12 @@ export const create_prenda_manual = createAsyncThunk(
 
 export const update_prenda_manual = createAsyncThunk(
   'prendas/update_prenda_manual',
-  async (payload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue, getState }) => {
     try {
+      const auth_user_id = select_auth_user_id(getState());
+      if (!auth_user_id) {
+        throw new Error('Debes iniciar sesion para editar prendas');
+      }
       const prenda = await update_prenda_manual_in_backend(payload?.prenda_id, payload);
       return prenda;
     } catch (error) {
