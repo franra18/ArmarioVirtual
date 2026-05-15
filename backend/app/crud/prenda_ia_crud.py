@@ -66,20 +66,26 @@ class PrendaIACRUD:
 
 		nombres_nuevos = [PrendaIACRUD._normalizar_nombre_color(n) for n in (ia_data.color_nombres or [])]
 		nombres_nuevos = [n for n in nombres_nuevos if n]
+		nombres_nuevos = list(dict.fromkeys(nombres_nuevos))
 
 		if nombres_nuevos:
-			# Buscar en BD SOLO los colores que la IA detectó
-			colores_db = db.query(Color).filter(Color.nombre.in_(nombres_nuevos)).all()
-			nombres_encontrados = {color.nombre: color.id for color in colores_db}
+			# Buscar en BD los colores existentes y mapear por nombre normalizado
+			colores_db = db.query(Color).all()
+			nombres_encontrados = {
+				PrendaIACRUD._normalizar_nombre_color(color.nombre): color.id
+				for color in colores_db
+				if (color.nombre or "").strip()
+			}
 
-			# Agregar los IDs encontrados
-			color_ids_resueltos.extend(nombres_encontrados.values())
-
-			# Crear los que realmente no existen
+			# Resolver IDs existentes o crear los faltantes
 			for nombre in nombres_nuevos:
-				if nombre not in nombres_encontrados:
-					nuevo_color = ColorCRUD.create(db, ColorCreate(nombre=nombre))
-					color_ids_resueltos.append(nuevo_color.id)
+				color_id = nombres_encontrados.get(nombre)
+				if color_id is not None:
+					color_ids_resueltos.append(color_id)
+					continue
+				nuevo_color = ColorCRUD.create(db, ColorCreate(nombre=nombre))
+				nombres_encontrados[nombre] = nuevo_color.id
+				color_ids_resueltos.append(nuevo_color.id)
 
 		if not color_ids_resueltos:
 			raise ValueError("La IA no devolvio colores validos para asociar a la prenda")
