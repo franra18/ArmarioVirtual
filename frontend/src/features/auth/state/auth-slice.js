@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   fetch_user_profile_from_backend,
   resolve_user_profile_from_firebase_user,
+  send_password_reset_email,
   sign_in_with_email_password,
   sign_out_from_firebase,
   sign_up_with_email_password,
@@ -29,6 +30,18 @@ export const sign_up_with_email = createAsyncThunk(
       return await resolve_user_profile_from_firebase_user(firebase_user);
     } catch (error) {
       return rejectWithValue(error?.message ?? 'No se pudo crear la cuenta');
+    }
+  }
+);
+
+export const reset_password_with_email = createAsyncThunk(
+  'auth/reset_password_with_email',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      await send_password_reset_email(email);
+      return true;
+    } catch (error) {
+      return rejectWithValue(error?.message ?? 'No se pudo enviar el correo de restablecimiento');
     }
   }
 );
@@ -81,6 +94,8 @@ const initial_state = {
   error: null,
   update_status: 'idle',
   update_error: null,
+  reset_status: 'idle',
+  reset_error: null,
 };
 
 const apply_user_session = (state, payload) => {
@@ -105,6 +120,8 @@ const auth_slice = createSlice({
       state.error = null;
       state.update_status = 'idle';
       state.update_error = null;
+      state.reset_status = 'idle';
+      state.reset_error = null;
     },
   },
   extraReducers: (builder) => {
@@ -139,6 +156,19 @@ const auth_slice = createSlice({
         state.firebase_uid = null;
         state.firebase_email = null;
         state.error = action.payload ?? 'No se pudo crear la cuenta';
+      });
+    builder
+      .addCase(reset_password_with_email.pending, (state) => {
+        state.reset_status = 'loading';
+        state.reset_error = null;
+      })
+      .addCase(reset_password_with_email.fulfilled, (state) => {
+        state.reset_status = 'succeeded';
+        state.reset_error = null;
+      })
+      .addCase(reset_password_with_email.rejected, (state, action) => {
+        state.reset_status = 'failed';
+        state.reset_error = action.payload ?? 'No se pudo enviar el correo de restablecimiento';
       });
     builder
       .addCase(load_firebase_user_profile.pending, (state) => {

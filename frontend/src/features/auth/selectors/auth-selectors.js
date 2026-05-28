@@ -7,3 +7,5 @@ export const select_auth_status = (state) => state.auth.status;
 export const select_auth_error = (state) => state.auth.error;
 export const select_auth_update_status = (state) => state.auth.update_status;
 export const select_auth_update_error = (state) => state.auth.update_error;
+export const select_auth_reset_status = (state) => state.auth.reset_status;
+export const select_auth_reset_error = (state) => state.auth.reset_error;

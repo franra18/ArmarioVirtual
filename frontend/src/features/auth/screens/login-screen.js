@@ -1,8 +1,13 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { sign_in_with_email, sign_up_with_email } from '../state/auth-slice';
-import { select_auth_error, select_auth_status } from '../selectors/auth-selectors';
+import { reset_password_with_email, sign_in_with_email, sign_up_with_email } from '../state/auth-slice';
+import {
+  select_auth_error,
+  select_auth_reset_error,
+  select_auth_reset_status,
+  select_auth_status,
+} from '../selectors/auth-selectors';
 import { use_app_dispatch, use_app_selector } from '../../../store/hooks';
 import { login_input_placeholder_color, login_screen_styles } from './login-screen.styles';
 
@@ -14,8 +19,12 @@ export function LoginScreen() {
   const dispatch = use_app_dispatch();
   const auth_status = use_app_selector(select_auth_status);
   const auth_error = use_app_selector(select_auth_error);
+  const reset_status = use_app_selector(select_auth_reset_status);
+  const reset_error = use_app_selector(select_auth_reset_error);
   const is_loading = auth_status === 'loading';
+  const is_reset_loading = reset_status === 'loading';
   const can_submit = email.trim().length > 0 && password.trim().length > 0 && !is_loading;
+  const can_reset_password = email.trim().length > 0 && !is_loading && !is_reset_loading;
 
   const handle_submit = async () => {
     const normalized_email = email.trim().toLowerCase();
@@ -31,6 +40,25 @@ export function LoginScreen() {
       router.replace('/(tabs)/home');
     } catch {
       // El mensaje ya queda gestionado en el estado global de auth.
+    }
+  };
+
+  // Solicita a Firebase el correo de restablecimiento usando el email escrito.
+  const handle_password_reset = async () => {
+    const normalized_email = email.trim().toLowerCase();
+    if (!normalized_email) {
+      Alert.alert('Correo requerido', 'Escribe tu correo para enviarte el enlace de restablecimiento.');
+      return;
+    }
+
+    try {
+      await dispatch(reset_password_with_email({ email: normalized_email })).unwrap();
+      Alert.alert(
+        'Revisa tu correo',
+        'Si la cuenta existe, Firebase enviará un enlace para restablecer la contraseña.'
+      );
+    } catch (error) {
+      Alert.alert('No se pudo restablecer', String(error ?? 'No se pudo enviar el correo de restablecimiento.'));
     }
   };
 
@@ -89,6 +117,11 @@ export function LoginScreen() {
             {auth_error}
           </Text>
         )}
+        {Boolean(reset_error) && !auth_error && (
+          <Text selectable style={login_screen_styles.error_text}>
+            {reset_error}
+          </Text>
+        )}
 
         <Pressable
           onPress={handle_submit}
@@ -115,6 +148,21 @@ export function LoginScreen() {
             {is_registering
               ? '¿Ya tienes cuenta? Inicia sesión'
               : '¿No tienes cuenta? Crear cuenta'}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={handle_password_reset}
+          disabled={!can_reset_password}
+          style={[
+            login_screen_styles.reset_button,
+            can_reset_password
+              ? login_screen_styles.reset_button_enabled
+              : login_screen_styles.reset_button_disabled,
+          ]}
+        >
+          <Text selectable style={login_screen_styles.reset_button_text}>
+            {is_reset_loading ? 'Enviando enlace...' : 'Olvidé mi contraseña'}
           </Text>
         </Pressable>
       </View>

@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
@@ -127,6 +128,16 @@ export async function sign_up_with_email_password(email, password) {
   );
 
   return user_credential.user;
+}
+
+// Dispara el correo de restablecimiento con Firebase Auth.
+export async function send_password_reset_email(email) {
+  const normalized_email = normalize_email(email);
+  if (!normalized_email) {
+    throw new Error('El correo es obligatorio');
+  }
+
+  await sendPasswordResetEmail(firebase_auth, normalized_email);
 }
 
 export function listen_to_auth_changes(callback) {

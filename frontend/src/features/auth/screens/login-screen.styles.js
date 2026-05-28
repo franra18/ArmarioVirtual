@@ -81,6 +81,25 @@ export const login_screen_styles = StyleSheet.create({
   toggle_text: {
     color: palette.sky_ink,
     fontFamily: typography.body_medium,
-    fontSize: 13,
+    fontSize: 15,
+  },
+  reset_button: {
+    alignSelf: 'center',
+    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    marginTop: 4,
+  },
+  reset_button_enabled: {
+    backgroundColor: palette.cream_deep,
+  },
+  reset_button_disabled: {
+    backgroundColor: palette.cream_deep,
+    opacity: 0.55,
+  },
+  reset_button_text: {
+    color: palette.walnut_deep,
+    fontFamily: typography.body_medium,
+    fontSize: 15,
   },
 });
