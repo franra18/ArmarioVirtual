@@ -121,3 +121,11 @@ pnpm exec expo start
 
 
 ## Demo en Video
+
+
+https://github.com/user-attachments/assets/69c25155-4a40-4706-a5b0-23ff1b69bed4
+
+
+
+https://github.com/user-attachments/assets/e30382f0-5636-4580-9bdf-a35830ccc53d
+
